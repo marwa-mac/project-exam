@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Connexion Étudiant</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #2c3e50, #3498db);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-container {
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 1s ease-in-out;
+      position: relative;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .login-icon {
+      position: absolute;
+      top: -30px;
+      left: calc(50% - 30px);
+      background-color: #fff;
+      border-radius: 50%;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .login-icon i {
+      font-size: 30px;
+      color: #3498db;
+    }
+
+    .login-container h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .input-field {
+      display: flex;
+      align-items: center;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      background-color: #f9f9f9;
+      position: relative;
+    }
+
+    .input-field i {
+      margin-right: 10px;
+      color: #2c3e50;
+    }
+
+    .input-field input {
+      border: none;
+      outline: none;
+      flex: 1;
+      background-color: transparent;
+      font-size: 16px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      cursor: pointer;
+      color: #2c3e50;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: #3498db;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-btn:hover {
+      background-color: #2980b9;
+    }
+
+    .register-link {
+      text-align: center;
+      margin-top: 20px;
+      color: #2c3e50;
+    }
+
+    .register-link a {
+      color: #e67e22;
+      text-decoration: none;
+    }
+
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+
+    .result-message {
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 6px;
+      display: none;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .success {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    .error {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-icon">
+      <i class="fas fa-user-lock"></i>
+    </div>
+    <h2>Connexion</h2>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">Identifiant institutionnel</label>
+        <div class="input-field">
+          <i class="fas fa-user-graduate"></i>
+          <input type="email" id="email" name="email" placeholder="prenom.nom@institution.edu" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <div class="input-field">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="password" name="password" placeholder="••••••••" required />
+          <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+        </div>
+      </div>
+
+      <button type="submit" class="login-btn">
+        <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i> Connexion
+      </button>
+
+      
+
+      <div id="loginResult" class="result-message"></div>
+    </form>
+  </div>
+
+  <script>
+    // Affichage / Masquage du mot de passe
+    document.getElementById("togglePassword").addEventListener("click", function () {
+      const passwordInput = document.getElementById("password");
+      const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+      passwordInput.setAttribute("type", type);
+      this.classList.toggle("fa-eye");
+      this.classList.toggle("fa-eye-slash");
+    });
+
+    // Connexion API
+    const API_BASE_URL = 'http://localhost:3000/api/auth';
+
+    document.getElementById("loginForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const resultEl = document.getElementById("loginResult");
+
+      if (!email || !password) {
+        resultEl.textContent = "Veuillez remplir tous les champs.";
+        resultEl.className = "result-message error";
+        resultEl.style.display = "block";
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const result = await response.json();
+
+        resultEl.style.display = "block";
+
+        if (response.ok) {
+          resultEl.textContent = result.message || "Connexion réussie.";
+          resultEl.className = "result-message success";
+
+          if (result.token) {
+            localStorage.setItem("authToken", result.token);
+          }
+        } else {
+          resultEl.textContent = result.message || "Échec de la connexion.";
+          resultEl.className = "result-message error";
+        }
+      } catch (error) {
+        resultEl.textContent = "Une erreur est survenue.";
+        resultEl.className = "result-message error";
+        resultEl.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>
