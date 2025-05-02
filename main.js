@@ -20,8 +20,18 @@ app.get('/auth', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'authview.html'));
 });
 
+app.get('/connexion', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'connexion.html'));
+});
+
+app.get('/inscription', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'inscription.html'));
+});
+
 // Routes authentification
 app.use('/api/auth', authRoutes);
+app.use('/api/connexion', authRoutes);
+app.use('/api/inscription', authRoutes);
 
 
 
