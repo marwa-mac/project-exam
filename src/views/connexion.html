@@ -224,23 +224,25 @@
 
         const result = await response.json();
 
-        resultEl.style.display = "block";
-
         if (response.ok) {
-          resultEl.textContent = result.message || "Connexion réussie.";
-          resultEl.className = "result-message success";
-
+          // Stockage du token dans le localStorage
           if (result.token) {
             localStorage.setItem("authToken", result.token);
           }
+          
+          // Redirection vers la page pass_exam.html
+          window.location.href = "./exams";
         } else {
+          // Affichage de l'erreur seulement en cas d'échec
           resultEl.textContent = result.message || "Échec de la connexion.";
           resultEl.className = "result-message error";
+          resultEl.style.display = "block";
         }
       } catch (error) {
-        resultEl.textContent = "Une erreur est survenue.";
+        resultEl.textContent = "Une erreur est survenue lors de la connexion.";
         resultEl.className = "result-message error";
         resultEl.style.display = "block";
+        console.error("Erreur de connexion:", error);
       }
     });
   </script>

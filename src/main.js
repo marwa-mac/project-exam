@@ -3,6 +3,9 @@ const path = require('path');
 const app = express();
 const examRoutes = require('./routes/pass_exam');
 const authRoutes = require('./routes/authRoutes');
+const createExamRoutes = require('./routes/create_exam');
+
+
 
 // Middleware
 app.use(express.json());
@@ -14,6 +17,10 @@ app.use('/api/exams', examRoutes);
 // Nouvelle route pour la page HTML
 app.get('/exams', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'pass_exam.html'));
+});
+
+app.get('/created', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'create_exam.html'));
 });
 
 app.get('/auth', (req, res) => {
@@ -32,6 +39,9 @@ app.get('/inscription', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/connexion', authRoutes);
 app.use('/api/inscription', authRoutes);
+
+//create exam page
+app.use('/api/created', createExamRoutes);
 
 
 

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EliteXam - Système de Gestion des Examens</title>
+    <link href="style.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-[#2c3e50] fixed w-full z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="ml-2 text-xl font-bold text-white">EliteXam</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-gray-300 hover:text-white transition-colors">Fonctionnalités</a>
+                    <a href="/connexion" class="btn btn-primary bg-blue-600 hover:bg-blue-700">Connexion</a>
+                </div>
+                <button class="md:hidden text-white">
+                    <i data-lucide="menu" class="h-6 w-6"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 bg-gradient-to-b from-[#2c3e50] to-[#34495e]">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 text-center md:text-left">
+                    <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">
+                        Gérez vos examens en toute simplicité
+                    </h1>
+                    <p class="text-xl text-gray-300 mb-8">
+                        Une solution complète pour organiser, suivre et analyser les examens de votre établissement.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                        <a href="/inscription" class="btn bg-blue-600 hover:bg-blue-700 text-white">
+                            Commencer gratuitement
+                        </a>
+                        <a href="#demo" class="btn bg-white text-[#2c3e50] hover:bg-gray-100">
+                            Voir la démo
+                        </a>
+                    </div>
+                </div>
+                <div class="md:w-1/2 mt-12 md:mt-0">
+                    <img src="https://images.pexels.com/photos/4778611/pexels-photo-4778611.jpeg" 
+                         alt="Gestion des examens" 
+                         class="rounded-lg shadow-2xl">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-[#2c3e50] mb-12">
+                Fonctionnalités principales
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                        <i data-lucide="calendar" class="h-6 w-6 text-blue-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-[#2c3e50] mb-3">Planification simplifiée</h3>
+                    <p class="text-gray-600">Organisez facilement vos sessions d'examens avec notre calendrier intuitif.</p>
+                </div>
+                <div class="p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                        <i data-lucide="users" class="h-6 w-6 text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-[#2c3e50] mb-3">Gestion des étudiants</h3>
+                    <p class="text-gray-600">Suivez les inscriptions et les performances de vos étudiants en temps réel.</p>
+                </div>
+                <div class="p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                        <i data-lucide="bar-chart-2" class="h-6 w-6 text-purple-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-[#2c3e50] mb-3">Analyses détaillées</h3>
+                    <p class="text-gray-600">Générez des rapports complets sur les résultats et les tendances.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-[#2c3e50] mb-2">500+</div>
+                    <div class="text-gray-600">Établissements</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-[#2c3e50] mb-2">50k+</div>
+                    <div class="text-gray-600">Examens gérés</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-[#2c3e50] mb-2">100k+</div>
+                    <div class="text-gray-600">Étudiants</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-[#2c3e50] mb-2">98%</div>
+                    <div class="text-gray-600">Satisfaction</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-[#2c3e50]">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold text-white mb-6">
+                Prêt à optimiser la gestion de vos examens ?
+            </h2>
+            <p class="text-xl text-gray-300 mb-8">
+                Rejoignez les centaines d'établissements qui nous font confiance.
+            </p>
+            <a href="/inscription" class="btn bg-blue-600 hover:bg-blue-700 text-white">
+                Inscrivez-vous
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#34495e] text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">À propos</h3>
+                    <p class="text-gray-400">ExamManager Pro est la solution leader pour la gestion des examens en milieu éducatif.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Liens rapides</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#features" class="text-gray-400 hover:text-white">Fonctionnalités</a></li>
+                        <li><a href="#demo" class="text-gray-400 hover:text-white">Démonstration</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Support</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#help" class="text-gray-400 hover:text-white">Centre d'aide</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-white">Contact</a></li>
+                        <li><a href="#docs" class="text-gray-400 hover:text-white">Documentation</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Légal</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#privacy" class="text-gray-400 hover:text-white">Confidentialité</a></li>
+                        <li><a href="#terms" class="text-gray-400 hover:text-white">Conditions</a></li>
+                        <li><a href="#gdpr" class="text-gray-400 hover:text-white">RGPD</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-400">&copy; 2024 ExamManager Pro. Tous droits réservés.</p>
+                    <div class="flex space-x-6 mt-4 md:mt-0">
+                        <a href="#twitter" class="text-gray-400 hover:text-white">
+                            <i data-lucide="twitter" class="h-5 w-5"></i>
+                        </a>
+                        <a href="#linkedin" class="text-gray-400 hover:text-white">
+                            <i data-lucide="linkedin" class="h-5 w-5"></i>
+                        </a>
+                        <a href="#facebook" class="text-gray-400 hover:text-white">
+                            <i data-lucide="facebook" class="h-5 w-5"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Mobile menu toggle
+        document.querySelector('button').addEventListener('click', function() {
+            const menu = document.querySelector('.md\\:flex');
+            menu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>

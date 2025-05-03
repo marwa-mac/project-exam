@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Plateforme Étudiant - Examens</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     :root {
@@ -31,7 +32,7 @@
       align-items: center;
     }
 
-    .avatar {
+    /* .avatar {
       background: #fff;
       color: var(--primary);
       width: 40px;
@@ -41,7 +42,7 @@
       justify-content: center;
       align-items: center;
       font-weight: bold;
-    }
+    } */
 
     .container {
       max-width: 1200px;
@@ -221,7 +222,11 @@
 
   <header>
     <h1>EliteXam</h1>
-    <div class="avatar">Aa</div>
+    <div class="avatar">
+      <a href="/exams" class="text-gray-300 hover:text-white transition-colors mx-2">Examens</a>
+      <a href="/created" class="text-gray-300 hover:text-white transition-colors mx-2">Mes examens</a>
+      <a href="#features" class="text-gray-300 hover:text-white transition-colors mx-2">Déconnexion</a>
+    </div>
   </header>
 
   <main class="container">
@@ -230,7 +235,7 @@
     <div class="filter-bar">
       <div class="filter-controls">
         <input type="text" id="searchInput" placeholder="Rechercher un examen...">
-        <select>
+        <!-- <select>
           <option>Toutes les filières</option>
           <option>SMI</option>
           <option>SMP</option>
@@ -242,17 +247,64 @@
           <option>Semestre 3</option>
           <option>Semestre 4</option>
           <option>Semestre 5</option>
-        </select>
+        </select> -->
       </div>
-      <button class="create-exam-btn" id="createExamBtn">
-        <i class="fa-solid fa-plus"></i> Créer un nouvel examen
-      </button>
     </div>
 
     <section class="exam-grid" id="examList">
       <!-- Les cartes des examens seront insérées ici -->
     </section>
   </main>
+
+  <footer class="bg-[#34495e] text-white py-12">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div>
+                <h3 class="text-lg font-semibold mb-4">À propos</h3>
+                <p class="text-gray-400">ExamManager Pro est la solution leader pour la gestion des examens en milieu éducatif.</p>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Liens rapides</h3>
+                <ul class="space-y-2">
+                    <li><a href="#features" class="text-gray-400 hover:text-white">Fonctionnalités</a></li>
+                    <li><a href="#demo" class="text-gray-400 hover:text-white">Démonstration</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Support</h3>
+                <ul class="space-y-2">
+                    <li><a href="#help" class="text-gray-400 hover:text-white">Centre d'aide</a></li>
+                    <li><a href="#contact" class="text-gray-400 hover:text-white">Contact</a></li>
+                    <li><a href="#docs" class="text-gray-400 hover:text-white">Documentation</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Légal</h3>
+                <ul class="space-y-2">
+                    <li><a href="#privacy" class="text-gray-400 hover:text-white">Confidentialité</a></li>
+                    <li><a href="#terms" class="text-gray-400 hover:text-white">Conditions</a></li>
+                    <li><a href="#gdpr" class="text-gray-400 hover:text-white">RGPD</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 pt-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400">&copy; 2024 ExamManager Pro. Tous droits réservés.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#twitter" class="text-gray-400 hover:text-white">
+                        <i data-lucide="twitter" class="h-5 w-5"></i>
+                    </a>
+                    <a href="#linkedin" class="text-gray-400 hover:text-white">
+                        <i data-lucide="linkedin" class="h-5 w-5"></i>
+                    </a>
+                    <a href="#facebook" class="text-gray-400 hover:text-white">
+                        <i data-lucide="facebook" class="h-5 w-5"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
 
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
