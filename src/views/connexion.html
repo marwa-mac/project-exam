@@ -189,62 +189,34 @@
   </div>
 
   <script>
-    // Affichage / Masquage du mot de passe
-    document.getElementById("togglePassword").addEventListener("click", function () {
-      const passwordInput = document.getElementById("password");
-      const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
-      passwordInput.setAttribute("type", type);
-      this.classList.toggle("fa-eye");
-      this.classList.toggle("fa-eye-slash");
-    });
+    // Remplacez votre gestionnaire de connexion par ceci
+document.querySelector('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
-    // Connexion API
-    const API_BASE_URL = 'http://localhost:3000/api/auth';
-
-    document.getElementById("loginForm").addEventListener("submit", async function (e) {
-      e.preventDefault();
-
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const resultEl = document.getElementById("loginResult");
-
-      if (!email || !password) {
-        resultEl.textContent = "Veuillez remplir tous les champs.";
-        resultEl.className = "result-message error";
-        resultEl.style.display = "block";
-        return;
-      }
-
-      try {
-        const response = await fetch(`${API_BASE_URL}/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
+    try {
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+            credentials: 'include' // Important pour les cookies
         });
 
-        const result = await response.json();
+        const data = await response.json();
 
         if (response.ok) {
-          // Stockage du token dans le localStorage
-          if (result.token) {
-            localStorage.setItem("authToken", result.token);
-          }
-          
-          // Redirection vers la page pass_exam.html
-          window.location.href = "./exams";
+            // Utilisez la redirection fournie par le serveur
+            window.location.href = data.redirect || '/exams';
         } else {
-          // Affichage de l'erreur seulement en cas d'échec
-          resultEl.textContent = result.message || "Échec de la connexion.";
-          resultEl.className = "result-message error";
-          resultEl.style.display = "block";
+            alert(data.message || 'Échec de la connexion');
         }
-      } catch (error) {
-        resultEl.textContent = "Une erreur est survenue lors de la connexion.";
-        resultEl.className = "result-message error";
-        resultEl.style.display = "block";
-        console.error("Erreur de connexion:", error);
-      }
-    });
+    } catch (error) {
+        console.error('Erreur:', error);
+        alert('Erreur lors de la connexion');
+    }
+});
   </script>
 </body>
 </html>

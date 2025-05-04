@@ -42,7 +42,7 @@ const authController = {
       // Création de l'utilisateur avec les données contrôlées
       const newUser = await User.create({
         email: normalizedEmail,
-        password: hashedPassword, // On utilise bien le hash ici
+        password: hashedPassword,
         first_name: first_name.trim(),
         last_name: last_name.trim(),
         birth_date: birth_date || null,
@@ -58,13 +58,21 @@ const authController = {
         { expiresIn: '24h' }
       );
 
+      // Définition du cookie HttpOnly
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000, // 24 heures
+        sameSite: 'strict'
+      });
+
       // Réponse sans le mot de passe
       const { password: _, ...userData } = newUser;
       
       return res.status(201).json({
         message: 'Inscription réussie',
-        token,
-        user: userData
+        user: userData,
+        redirect: '/exams'
       });
 
     } catch (error) {
@@ -77,7 +85,7 @@ const authController = {
         })
       });
     }
-},
+  },
 
   /**
    * Connexion de l'utilisateur
@@ -93,44 +101,20 @@ const authController = {
 
       // Normalisation de l'email
       const normalizedEmail = email.toLowerCase().trim();
-      console.log(`Tentative de connexion: ${normalizedEmail}`);
 
       // Récupération de l'utilisateur
       const user = await User.findByEmail(normalizedEmail);
       if (!user) {
-        console.log('Email non trouvé en base');
         return res.status(401).json({ message: 'Identifiants incorrects' });
       }
 
       // Normalisation du mot de passe
       const normalizedPassword = password.normalize('NFKC');
-      
-      // Debug: Vérification visuelle
-      console.log('Comparaison entre:', 
-        `"${normalizedPassword}"`, 
-        'et hash:', 
-        user.password.substring(0, 10) + '...'
-      );
 
       // Comparaison sécurisée
       const isMatch = await bcrypt.compare(normalizedPassword, user.password);
-      console.log('Résultat comparaison:', isMatch);
-
       if (!isMatch) {
-        // Debug avancé
-        const testHash = await bcrypt.hash(normalizedPassword, 12);
-        console.log('Hash test généré:', testHash);
-        
-        return res.status(401).json({ 
-          message: 'Identifiants incorrects',
-          ...(process.env.NODE_ENV === 'development' && {
-            debug: {
-              passwordLength: normalizedPassword.length,
-              firstChars: normalizedPassword.substring(0, 5),
-              hashStored: user.password.substring(0, 15) + '...'
-            }
-          })
-        });
+        return res.status(401).json({ message: 'Identifiants incorrects' });
       }
 
       // Génération du token
@@ -140,13 +124,21 @@ const authController = {
         { expiresIn: '24h' }
       );
 
+      // Définition du cookie HttpOnly
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000, // 24 heures
+        sameSite: 'strict'
+      });
+
       // Réponse sans mot de passe
       const { password: _, ...userData } = user;
       
       return res.json({
         message: 'Connexion réussie',
-        token,
-        user: userData
+        user: userData,
+        redirect: '/exams'
       });
 
     } catch (error) {
@@ -157,6 +149,28 @@ const authController = {
           error: error.message
         })
       });
+    }
+  },
+
+  /**
+   * Déconnexion de l'utilisateur
+   */
+  async logout(req, res) {
+    try {
+      // Suppression du cookie
+      res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict'
+      });
+      
+      return res.status(200).json({ 
+        message: 'Déconnexion réussie',
+        redirect: '/auth'
+      });
+    } catch (error) {
+      console.error('Erreur déconnexion:', error);
+      return res.status(500).json({ message: 'Erreur serveur' });
     }
   },
 
@@ -176,6 +190,24 @@ const authController = {
     } catch (error) {
       console.error('Erreur récupération profil:', error);
       return res.status(500).json({ message: 'Erreur serveur' });
+    }
+  },
+
+  /**
+   * Vérification de l'authentification
+   */
+  async checkAuth(req, res) {
+    try {
+      const token = req.cookies.token;
+      if (!token) {
+        return res.status(401).json({ isAuthenticated: false });
+      }
+
+      jwt.verify(token, process.env.JWT_SECRET || 'votre_secret_secure');
+      return res.json({ isAuthenticated: true });
+      
+    } catch (error) {
+      return res.status(401).json({ isAuthenticated: false });
     }
   }
 };
