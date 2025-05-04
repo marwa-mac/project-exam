@@ -1,6 +1,6 @@
 const examModel = require('../models/create_exam');
 
-const getAllExamsById = async (req, res) => {
+const getAllExams = async (req, res) => {
   try {
     const exams = await examModel.getAllExams();
     
@@ -23,5 +23,5 @@ const getAllExamsById = async (req, res) => {
 };
 
 module.exports = {
-  getAllExamsById
+  getAllExams
 };

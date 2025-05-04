@@ -224,8 +224,10 @@
     <h1>EliteXam</h1>
     <div class="avatar">
       <a href="/exams" class="text-gray-300 hover:text-white transition-colors mx-2">Examens</a>
-      <a href="/created" class="text-gray-300 hover:text-white transition-colors mx-2">Mes examens</a>
-      <a href="#features" class="text-gray-300 hover:text-white transition-colors mx-2">Déconnexion</a>
+      <a href="/created" class="text-white transition-colors mx-2">Mes examens</a>
+      <button id="logoutBtn" class="text-gray-300 hover:text-white transition-colors mx-2 bg-transparent border-none cursor-pointer">
+        Déconnexion
+       </button>
     </div>
   </header>
 
@@ -310,58 +312,109 @@
 </footer>
 
   <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      try {
-        const response = await fetch('/api/created');
-        if (!response.ok) throw new Error('Erreur lors du chargement des examens');
+ document.addEventListener('DOMContentLoaded', async () => {
+    // Vérifier l'authentification au chargement
+    await checkAuth();
+    displayExams();
+    // Charger les examens
+    
+});
 
-        const exams = await response.json();
-        if (exams.length > 0 && exams[0].title === undefined) {
-          throw new Error('Structure de données incorrecte');
+// Fonction pour vérifier l'authentification
+async function checkAuth() {
+        try {
+            const response = await fetch('/api/auth/profile', {
+                credentials: 'include' // Important pour les cookies
+            });
+            
+            if (!response.ok) {
+                window.location.href = '/auth'; // Redirection si non authentifié
+            }
+        } catch (error) {
+            console.error('Erreur vérification auth:', error);
+            window.location.href = '/auth';
         }
-
-        displayExams(exams);
-      } catch (error) {
-        console.error('Erreur:', error);
-        alert("Une erreur est survenue lors du chargement des examens");
-      }
-    });
-
-    function displayExams(exams) {
-      const container = document.getElementById('examList');
-
-      if (exams.length === 0) {
-        container.innerHTML = '<p class="text-center text-subtext col-span-full">Aucun examen trouvé</p>';
-        return;
-      }
-
-      container.innerHTML = '';
-
-      exams.forEach(exam => {
-        const card = document.createElement('article');
-        card.className = 'card';
-        card.innerHTML = `
-          <div class="card-header">
-            <h2>${exam.title || 'Non défini'}</h2>
-          </div>
-          <div class="card-body">
-            <div class="exam-meta">
-              <div class="exam-description">${exam.description || 'Aucune description disponible'}</div>
-              <div><i class="fa-solid fa-graduation-cap"></i> Filière : ${exam.targetAudience || 'none'}</div>
-              <div><i class="fa-solid fa-calendar-days"></i> Semestre : ${exam.semestre || 'Inconnu'}</div>
-              <div><i class="fa-solid fa-clock"></i> Limite : ${exam.dateLimit || 'Non définie'}</div>
-            </div>
-            <button class="start-btn">Commencer l'examen</button>
-          </div>
-        `;
-        container.appendChild(card);
-      });
     }
 
-    document.getElementById('createExamBtn').addEventListener('click', () => {
-      alert("Création d'un nouvel examen !");
-      // Logique de redirection ou de formulaire à ajouter ici
-    });
+// Fonction d'affichage des examens (inchangée)
+async function displayExams() {
+        try {
+            const response = await fetch('/api/created', {
+                credentials: 'include' // Pour envoyer les cookies
+            });
+            
+            if (!response.ok) {
+                if (response.status === 401) {
+                    window.location.href = '/auth';
+                    return;
+                }
+                throw new Error('Erreur lors du chargement des examens');
+            }
+
+            const exams = await response.json();
+            loadExams(exams);
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert("Une erreur est survenue lors du chargement des examens");
+        }
+    }
+
+// Gestion de la déconnexion
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+    try {
+        const response = await fetch('/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            window.location.href = '/auth';
+        } else {
+            const errorData = await response.json();
+            alert(errorData.message || 'Échec de la déconnexion');
+        }
+    } catch (error) {
+        console.error('Erreur lors de la déconnexion:', error);
+        alert('Une erreur est survenue lors de la déconnexion');
+    }
+});
+
+function loadExams(exams) {
+        const container = document.getElementById('examList');
+        
+        if (exams.length === 0) {
+            container.innerHTML = '<p class="text-center text-subtext col-span-full">Aucun examen trouvé</p>';
+            return;
+        }
+
+        container.innerHTML = '';
+
+        exams.forEach(exam => {
+            const card = document.createElement('article');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="card-header">
+                    <h2>${exam.title || 'Non défini'}</h2>
+                </div>
+                <div class="card-body">
+                    <div class="exam-meta">
+                        <div class="exam-description">${exam.description || 'Aucune description disponible'}</div>
+                        <div><i class="fa-solid fa-graduation-cap"></i> Filière : ${exam.targetAudience || 'none'}</div>
+                        <div><i class="fa-solid fa-calendar-days"></i> Semestre : ${exam.semestre || 'Inconnu'}</div>
+                        <div><i class="fa-solid fa-clock"></i> Limite : ${exam.dateLimit || 'Non définie'}</div>
+                    </div>
+                    <button class="start-btn">Commencer l'examen</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+
+// Bouton de création d'examen
+document.getElementById('createExamBtn').addEventListener('click', () => {
+    window.location.href = '/created';
+});
   </script>
 
 </body>
