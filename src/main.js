@@ -20,7 +20,7 @@ app.use('/api/created', createExamRoutes);
 
 // Pages non sécurisées
 app.get('/auth', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'authview.html'));
+    res.sendFile(path.join(__dirname, 'views', '../public/index.html'));
 });
 
 app.get('/connexion', (req, res) => {

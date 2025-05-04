@@ -223,7 +223,7 @@
   <header>
     <h1>EliteXam</h1>
     <div class="flex items-center space-x-4">
-        <a href="/exams" class="text-gray-300 hover:text-white transition-colors">Examens</a>
+        <a href="/exams" class="text-white transition-colors">Examens</a>
         <a href="/created" class="text-gray-300 hover:text-white transition-colors">Mes examens</a>
         <button id="logoutBtn" class="text-gray-300 hover:text-white transition-colors cursor-pointer">
             Déconnexion
@@ -308,101 +308,101 @@
     </div>
 </footer>
 
-<script>
-  // Vérification de l'authentification au chargement
-  document.addEventListener('DOMContentLoaded', async () => {
-      await checkAuth();
-      loadExams();
-  });
+  <script>
+    // Vérification de l'authentification au chargement
+    document.addEventListener('DOMContentLoaded', async () => {
+        await checkAuth();
+        loadExams();
+    });
 
-  // Fonction pour vérifier si l'utilisateur est connecté
-  async function checkAuth() {
-      try {
-          const response = await fetch('/api/auth/profile', {
-              credentials: 'include' // Important pour les cookies
-          });
-          
-          if (!response.ok) {
-              window.location.href = '/auth'; // Redirection si non authentifié
-          }
-      } catch (error) {
-          console.error('Erreur vérification auth:', error);
-          window.location.href = '/auth';
-      }
-  }
+    // Fonction pour vérifier si l'utilisateur est connecté
+    async function checkAuth() {
+        try {
+            const response = await fetch('/api/auth/profile', {
+                credentials: 'include' // Important pour les cookies
+            });
+            
+            if (!response.ok) {
+                window.location.href = '/auth'; // Redirection si non authentifié
+            }
+        } catch (error) {
+            console.error('Erreur vérification auth:', error);
+            window.location.href = '/auth';
+        }
+    }
 
-  // Fonction pour charger les examens (modifiée)
-  async function loadExams() {
-      try {
-          const response = await fetch('/api/exams', {
-              credentials: 'include' // Pour envoyer les cookies
-          });
-          
-          if (!response.ok) {
-              if (response.status === 401) {
-                  window.location.href = '/auth';
-                  return;
-              }
-              throw new Error('Erreur lors du chargement des examens');
-          }
+    // Fonction pour charger les examens (modifiée)
+    async function loadExams() {
+        try {
+            const response = await fetch('/api/exams', {
+                credentials: 'include' // Pour envoyer les cookies
+            });
+            
+            if (!response.ok) {
+                if (response.status === 401) {
+                    window.location.href = '/auth';
+                    return;
+                }
+                throw new Error('Erreur lors du chargement des examens');
+            }
 
-          const exams = await response.json();
-          displayExams(exams);
-      } catch (error) {
-          console.error('Erreur:', error);
-          alert("Une erreur est survenue lors du chargement des examens");
-      }
-  }
+            const exams = await response.json();
+            displayExams(exams);
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert("Une erreur est survenue lors du chargement des examens");
+        }
+    }
 
-  // Gestion de la déconnexion
-  document.getElementById('logoutBtn').addEventListener('click', async () => {
-      try {
-          const response = await fetch('/api/auth/logout', {
-              method: 'POST',
-              credentials: 'include'
-          });
-          
-          if (response.ok) {
-              window.location.href = '/auth';
-          } else {
-              alert('Échec de la déconnexion');
-          }
-      } catch (error) {
-          console.error('Erreur déconnexion:', error);
-      }
-  });
+    // Gestion de la déconnexion
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        try {
+            const response = await fetch('/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                window.location.href = '/auth';
+            } else {
+                alert('Échec de la déconnexion');
+            }
+        } catch (error) {
+            console.error('Erreur déconnexion:', error);
+        }
+    });
 
-  // Votre fonction displayExams reste inchangée
-  function displayExams(exams) {
-      const container = document.getElementById('examList');
-      
-      if (exams.length === 0) {
-          container.innerHTML = '<p class="text-center text-subtext col-span-full">Aucun examen trouvé</p>';
-          return;
-      }
+    // Votre fonction displayExams reste inchangée
+    function displayExams(exams) {
+        const container = document.getElementById('examList');
+        
+        if (exams.length === 0) {
+            container.innerHTML = '<p class="text-center text-subtext col-span-full">Aucun examen trouvé</p>';
+            return;
+        }
 
-      container.innerHTML = '';
+        container.innerHTML = '';
 
-      exams.forEach(exam => {
-          const card = document.createElement('article');
-          card.className = 'card';
-          card.innerHTML = `
-              <div class="card-header">
-                  <h2>${exam.title || 'Non défini'}</h2>
-              </div>
-              <div class="card-body">
-                  <div class="exam-meta">
-                      <div class="exam-description">${exam.description || 'Aucune description disponible'}</div>
-                      <div><i class="fa-solid fa-graduation-cap"></i> Filière : ${exam.targetAudience || 'none'}</div>
-                      <div><i class="fa-solid fa-calendar-days"></i> Semestre : ${exam.semestre || 'Inconnu'}</div>
-                      <div><i class="fa-solid fa-clock"></i> Limite : ${exam.dateLimit || 'Non définie'}</div>
-                  </div>
-                  <button class="start-btn">Commencer l'examen</button>
-              </div>
-          `;
-          container.appendChild(card);
-      });
-  }
+        exams.forEach(exam => {
+            const card = document.createElement('article');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="card-header">
+                    <h2>${exam.title || 'Non défini'}</h2>
+                </div>
+                <div class="card-body">
+                    <div class="exam-meta">
+                        <div class="exam-description">${exam.description || 'Aucune description disponible'}</div>
+                        <div><i class="fa-solid fa-graduation-cap"></i> Filière : ${exam.targetAudience || 'none'}</div>
+                        <div><i class="fa-solid fa-calendar-days"></i> Semestre : ${exam.semestre || 'Inconnu'}</div>
+                        <div><i class="fa-solid fa-clock"></i> Limite : ${exam.dateLimit || 'Non définie'}</div>
+                    </div>
+                    <button class="start-btn">Commencer l'examen</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
 </script>
 
 </body>
