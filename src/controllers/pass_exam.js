@@ -6,6 +6,7 @@ const getAllExams = async (req, res) => {
     
     // Formatage explicite des données
     const formattedExams = exams.map(exam => ({
+      id : exam.id || exam.Id || exam.ID,
       title: exam.title || exam.Title || exam.TITLE,
       description: exam.description || exam.Description || exam.DESCRIPTION,
       targetAudience: exam.targetAudience || exam.TargetAudience || exam.TARGETAUDIENCE, 

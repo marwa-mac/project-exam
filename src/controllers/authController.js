@@ -58,6 +58,8 @@ const authController = {
         { expiresIn: '24h' }
       );
 
+      console.log("Token généré:", token);
+
       // Définition du cookie HttpOnly
       res.cookie('token', token, {
         httpOnly: true,
@@ -123,6 +125,8 @@ const authController = {
         process.env.JWT_SECRET || 'votre_secret_secure',
         { expiresIn: '24h' }
       );
+
+      console.log("Token généré:", token);
 
       // Définition du cookie HttpOnly
       res.cookie('token', token, {

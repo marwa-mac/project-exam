@@ -379,36 +379,48 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
     }
 });
 
+// Dans la fonction loadExams(exams) de votre create_exam.html
 function loadExams(exams) {
-        const container = document.getElementById('examList');
-        
-        if (exams.length === 0) {
-            container.innerHTML = '<p class="text-center text-subtext col-span-full">Aucun examen trouvé</p>';
-            return;
-        }
-
-        container.innerHTML = '';
-
-        exams.forEach(exam => {
-            const card = document.createElement('article');
-            card.className = 'card';
-            card.innerHTML = `
-                <div class="card-header">
-                    <h2>${exam.title || 'Non défini'}</h2>
-                </div>
-                <div class="card-body">
-                    <div class="exam-meta">
-                        <div class="exam-description">${exam.description || 'Aucune description disponible'}</div>
-                        <div><i class="fa-solid fa-graduation-cap"></i> Filière : ${exam.targetAudience || 'none'}</div>
-                        <div><i class="fa-solid fa-calendar-days"></i> Semestre : ${exam.semestre || 'Inconnu'}</div>
-                        <div><i class="fa-solid fa-clock"></i> Limite : ${exam.dateLimit || 'Non définie'}</div>
-                    </div>
-                    <button class="start-btn">Commencer l'examen</button>
-                </div>
-            `;
-            container.appendChild(card);
-        });
+    const container = document.getElementById('examList');
+    
+    if (exams.length === 0) {
+        container.innerHTML = '<p class="text-center text-subtext col-span-full">Aucun examen trouvé</p>';
+        return;
     }
+
+    container.innerHTML = '';
+
+    exams.forEach(exam => {
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.innerHTML = `
+            <div class="card-header">
+                <h2>${exam.title || 'Non défini'}</h2>
+            </div>
+            <div class="card-body">
+                <div class="exam-meta">
+                    <div class="exam-description">${exam.description || 'Aucune description disponible'}</div>
+                    <div><i class="fa-solid fa-graduation-cap"></i> Filière : ${exam.targetAudience || 'none'}</div>
+                    <div><i class="fa-solid fa-calendar-days"></i> Semestre : ${exam.semestre || 'Inconnu'}</div>
+                    <div><i class="fa-solid fa-clock"></i> Limite : ${exam.dateLimit || 'Non définie'}</div>
+                </div>
+                <button class="start-btn" data-exam-id="${exam.id}">
+                    Ajouter des questions
+                </button>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+
+    // Ajouter les écouteurs d'événements aux boutons
+    document.querySelectorAll('.start-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const examId = this.getAttribute('data-exam-id');
+            // Redirection vers la page d'ajout de questions avec l'ID de l'examen
+            window.location.href = `/add-questions?exam_id=${examId}`;
+        });
+    });
+}
 
 
 // Bouton de création d'examen
