@@ -380,7 +380,7 @@
           
           // Redirection après 1 seconde
           setTimeout(() => {
-            window.location.href = data.redirect || '/exams';
+            window.location.href = data.redirect || '/created';
           }, 1000);
         } else {
           resultDiv.textContent = data.message || 'Échec de la connexion';

@@ -74,7 +74,7 @@ const authController = {
       return res.status(201).json({
         message: 'Inscription réussie',
         user: userData,
-        redirect: '/exams'
+        redirect: '/connexion'
       });
 
     } catch (error) {
@@ -142,7 +142,7 @@ const authController = {
       return res.json({
         message: 'Connexion réussie',
         user: userData,
-        redirect: '/exams'
+        redirect: '/created'
       });
 
     } catch (error) {
