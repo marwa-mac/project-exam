@@ -32,18 +32,6 @@
       align-items: center;
     }
 
-    /* .avatar {
-      background: #fff;
-      color: var(--primary);
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: bold;
-    } */
-
     .container {
       max-width: 1200px;
       margin: 2rem auto;
@@ -216,6 +204,14 @@
         margin-top: 0.5rem;
       }
     }
+
+    /* Styles pour le modal */
+    .hidden { display: none; }
+    .fixed { position: fixed; }
+    .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+    .bg-opacity-50 { background-color: rgba(0, 0, 0, 0.5); }
+    .z-50 { z-index: 50; }
+    .max-w-md { max-width: 28rem; }
   </style>
 </head>
 <body>
@@ -237,19 +233,6 @@
     <div class="filter-bar">
       <div class="filter-controls">
         <input type="text" id="searchInput" placeholder="Rechercher un examen...">
-        <!-- <select>
-          <option>Toutes les filières</option>
-          <option>SMI</option>
-          <option>SMP</option>
-        </select>
-        <select>
-          <option>Tous les semestres</option>
-          <option>Semestre 1</option>
-          <option>Semestre 2</option>
-          <option>Semestre 3</option>
-          <option>Semestre 4</option>
-          <option>Semestre 5</option>
-        </select> -->
       </div>
       <button class="create-exam-btn" id="createExamBtn">
         <i class="fa-solid fa-plus"></i> Créer un nouvel examen
@@ -309,125 +292,256 @@
             </div>
         </div>
     </div>
-</footer>
+  </footer>
+
+  <!-- Modal de création d'examen -->
+  <div id="examModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+      <h3 class="text-xl font-semibold mb-4">Créer un nouvel examen</h3>
+      <form id="createExamForm" class="space-y-4">
+        <div>
+          <label for="title" class="block text-sm font-medium text-gray-700">Titre*</label>
+          <input type="text" id="title" name="title" required 
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+        </div>
+        
+        <div>
+          <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+          <textarea id="description" name="description" rows="3"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"></textarea>
+        </div>
+        
+        <div>
+          <label for="target_audience" class="block text-sm font-medium text-gray-700">Public cible*</label>
+          <input type="text" id="target_audience" name="target_audience" required
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+        </div>
+        
+        <div>
+          <label for="semestre" class="block text-sm font-medium text-gray-700">Semestre*</label>
+          <select id="semestre" name="semestre" required
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+            <option value="">Sélectionnez un semestre</option>
+            <option value="Semestre 1">Semestre 1</option>
+            <option value="Semestre 2">Semestre 2</option>
+            <option value="Semestre 3">Semestre 3</option>
+            <option value="Semestre 4">Semestre 4</option>
+            <option value="Semestre 5">Semestre 5</option>
+            <option value="Semestre 6">Semestre 6</option>
+          </select>
+        </div>
+        
+        <div class="flex justify-end space-x-3 pt-2">
+          <button type="button" id="cancelCreateExam" 
+                  class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+            Annuler
+          </button>
+          <button type="submit" id="submitExamBtn"
+                  class="px-4 py-2 bg-blue-600 rounded-md text-sm font-medium text-white hover:bg-blue-700">
+            Créer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script>
- document.addEventListener('DOMContentLoaded', async () => {
-    // Vérifier l'authentification au chargement
-    await checkAuth();
-    displayExams();
-    // Charger les examens
-    
-});
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkAuth();
+      displayExams();
+      
+      // Stocker l'ID utilisateur après l'authentification
+      const user = await getCurrentUser();
+      if (user) {
+        localStorage.setItem('currentUser', JSON.stringify(user));
+      }
+    });
 
-// Fonction pour vérifier l'authentification
-async function checkAuth() {
-        try {
-            const response = await fetch('/api/auth/profile', {
-                credentials: 'include' // Important pour les cookies
-            });
-            
-            if (!response.ok) {
-                window.location.href = '/auth'; // Redirection si non authentifié
-            }
-        } catch (error) {
-            console.error('Erreur vérification auth:', error);
-            window.location.href = '/auth';
+    // Fonction pour récupérer l'utilisateur actuel
+    async function getCurrentUser() {
+      try {
+        const response = await fetch('/api/auth/profile', {
+          credentials: 'include'
+        });
+        if (response.ok) {
+          return await response.json();
         }
+      } catch (error) {
+        console.error('Erreur récupération utilisateur:', error);
+      }
+      return null;
     }
 
-// Fonction d'affichage des examens (inchangée)
-async function displayExams() {
-        try {
-            const response = await fetch('/api/created', {
-                credentials: 'include' // Pour envoyer les cookies
-            });
-            
-            if (!response.ok) {
-                if (response.status === 401) {
-                    window.location.href = '/auth';
-                    return;
-                }
-                throw new Error('Erreur lors du chargement des examens');
-            }
+    // Gestion du bouton de création
+    document.getElementById('createExamBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('examModal').classList.remove('hidden');
+    });
 
-            const exams = await response.json();
-            loadExams(exams);
-        } catch (error) {
-            console.error('Erreur:', error);
-            alert("Une erreur est survenue lors du chargement des examens");
-        }
-    }
+    // Gestion de l'annulation
+    document.getElementById('cancelCreateExam').addEventListener('click', () => {
+      document.getElementById('examModal').classList.add('hidden');
+    });
 
-// Gestion de la déconnexion
-document.getElementById('logoutBtn').addEventListener('click', async () => {
-    try {
-        const response = await fetch('/api/auth/logout', {
-            method: 'POST',
-            credentials: 'include'
+    // Gestion de la soumission du formulaire
+    document.getElementById('createExamForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submitExamBtn');
+      const originalBtnText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Création en cours...';
+
+      const user = JSON.parse(localStorage.getItem('currentUser'));
+      if (!user?.id) {
+        showError('Utilisateur non identifié - Veuillez vous reconnecter');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+        return;
+      }
+
+      const formData = {
+        title: e.target.title.value,
+        description: e.target.description.value,
+        target_audience: e.target.target_audience.value,
+        semestre: e.target.semestre.value,
+        created_by: user.id
+      };
+
+      try {
+        const response = await fetch('/api/examsCreate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+          },
+          body: JSON.stringify(formData)
         });
 
-        if (response.ok) {
-            window.location.href = '/auth';
-        } else {
-            const errorData = await response.json();
-            alert(errorData.message || 'Échec de la déconnexion');
-        }
-    } catch (error) {
-        console.error('Erreur lors de la déconnexion:', error);
-        alert('Une erreur est survenue lors de la déconnexion');
-    }
-});
+        const data = await response.json().catch(() => {
+          throw new Error('Réponse serveur invalide');
+        });
 
-// Dans la fonction loadExams(exams) de votre create_exam.html
-function loadExams(exams) {
-    const container = document.getElementById('examList');
-    
-    if (exams.length === 0) {
+        if (!response.ok) {
+          throw new Error(data.error || 'Erreur lors de la création');
+        }
+
+        showSuccess('Examen créé avec succès!');
+        e.target.reset();
+        document.getElementById('examModal').classList.add('hidden');
+        displayExams();
+
+      } catch (error) {
+        console.error('Erreur:', error);
+        showError(error.message || 'Erreur de communication avec le serveur');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+      }
+    });
+
+    // Fonction pour vérifier l'authentification
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/auth/profile', {
+          credentials: 'include'
+        });
+        if (!response.ok) {
+          window.location.href = '/auth';
+        }
+      } catch (error) {
+        window.location.href = '/auth';
+      }
+    }
+
+    // Fonction pour afficher les examens
+    async function displayExams() {
+      try {
+        const response = await fetch('/api/created', {
+          credentials: 'include'
+        });
+        if (!response.ok) throw new Error('Erreur chargement examens');
+        const exams = await response.json();
+        loadExams(exams);
+      } catch (error) {
+        console.error('Erreur:', error);
+        showError("Erreur lors du chargement des examens");
+      }
+    }
+
+    // Fonction pour charger les examens dans le DOM
+    function loadExams(exams) {
+      const container = document.getElementById('examList');
+      if (exams.length === 0) {
         container.innerHTML = '<p class="text-center text-subtext col-span-full">Aucun examen trouvé</p>';
         return;
-    }
+      }
 
-    container.innerHTML = '';
-
-    exams.forEach(exam => {
+      container.innerHTML = '';
+      exams.forEach(exam => {
         const card = document.createElement('article');
         card.className = 'card';
         card.innerHTML = `
-            <div class="card-header">
-                <h2>${exam.title || 'Non défini'}</h2>
+          <div class="card-header">
+            <h2>${exam.title || 'Non défini'}</h2>
+          </div>
+          <div class="card-body">
+            <div class="exam-meta">
+              <div class="exam-description">${exam.description || 'Aucune description disponible'}</div>
+              <div><i class="fa-solid fa-graduation-cap"></i> Filière : ${exam.targetAudience || 'none'}</div>
+              <div><i class="fa-solid fa-calendar-days"></i> Semestre : ${exam.semestre || 'Inconnu'}</div>
             </div>
-            <div class="card-body">
-                <div class="exam-meta">
-                    <div class="exam-description">${exam.description || 'Aucune description disponible'}</div>
-                    <div><i class="fa-solid fa-graduation-cap"></i> Filière : ${exam.targetAudience || 'none'}</div>
-                    <div><i class="fa-solid fa-calendar-days"></i> Semestre : ${exam.semestre || 'Inconnu'}</div>
-                    <div><i class="fa-solid fa-clock"></i> Limite : ${exam.dateLimit || 'Non définie'}</div>
-                </div>
-                <button class="start-btn" data-exam-id="${exam.id}">
-                    Ajouter des questions
-                </button>
-            </div>
+            <button class="start-btn" data-exam-id="${exam.id}">
+              Ajouter des questions
+            </button>
+          </div>
         `;
         container.appendChild(card);
-    });
+      });
 
-    // Ajouter les écouteurs d'événements aux boutons
-    document.querySelectorAll('.start-btn').forEach(button => {
+      // Gestion des boutons "Ajouter des questions"
+      document.querySelectorAll('.start-btn').forEach(button => {
         button.addEventListener('click', function() {
-            const examId = this.getAttribute('data-exam-id');
-            // Redirection vers la page d'ajout de questions avec l'ID de l'examen
-            window.location.href = `/add-questions?exam_id=${examId}`;
+          const examId = this.getAttribute('data-exam-id');
+          window.location.href = `/add-questions?exam_id=${examId}`;
         });
+      });
+    }
+
+    // Gestion de la déconnexion
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      try {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          credentials: 'include'
+        });
+        localStorage.removeItem('currentUser');
+        window.location.href = '/auth';
+      } catch (error) {
+        console.error('Erreur déconnexion:', error);
+      }
     });
-}
 
+    // Fonctions d'affichage des messages
+    function showError(message) {
+      const errorElement = document.getElementById('error-message') || createMessageElement('error-message', 'text-red-500');
+      errorElement.textContent = message;
+      setTimeout(() => errorElement.textContent = '', 5000);
+    }
 
-// Bouton de création d'examen
-document.getElementById('createExamBtn').addEventListener('click', () => {
-    window.location.href = '/created';
-});
+    function showSuccess(message) {
+      const successElement = document.getElementById('success-message') || createMessageElement('success-message', 'text-green-500');
+      successElement.textContent = message;
+      setTimeout(() => successElement.textContent = '', 3000);
+    }
+
+    function createMessageElement(id, className) {
+      const element = document.createElement('div');
+      element.id = id;
+      element.className = `fixed top-4 right-4 p-4 rounded-md bg-white shadow-lg ${className}`;
+      document.body.appendChild(element);
+      return element;
+    }
   </script>
-
 </body>
 </html>

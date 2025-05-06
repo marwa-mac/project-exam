@@ -18,6 +18,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/exams', examRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/created', createExamRoutes);
+app.use('/api/examsCreate', createExamRoutes); 
+
+
 
 // Pages non sécurisées
 app.get('/auth', (req, res) => {
