@@ -6,6 +6,7 @@ const examRoutes = require('./routes/pass_exam');
 const authRoutes = require('./routes/authRoutes');
 const createExamRoutes = require('./routes/create_exam');
 const securePageMiddleware = require('./middlewares/authMiddleware');
+const questionsRoutes = require('./routes/questionsRoutes');
 
 
 // Middleware
@@ -38,6 +39,14 @@ app.get('/exams', securePageMiddleware, (req, res) => {
 
 app.get('/created', securePageMiddleware, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'create_exam.html'));
+});
+
+app.use('/api/questions', questionsRoutes);
+
+app.get('/add-questions', (req, res) => {
+    // Vous pouvez utiliser sendFile pour un fichier HTML statique
+    res.sendFile(path.join(__dirname, 'views', 'add-questions.html'));
+    
 });
 
 // Démarrer le serveur
