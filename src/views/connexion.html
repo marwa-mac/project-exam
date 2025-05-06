@@ -162,7 +162,7 @@
       color: #991b1b;
     }
 
-    /* Header styles */
+    
     nav {
       background-color: #2c3e50;
       position: fixed;
@@ -240,7 +240,7 @@
   </style>
 </head>
 <body>
-  <!-- Header -->
+  
   <nav class="bg-[#2c3e50] fixed w-full z-50 mb-8">
     <div class="container mx-auto px-4">
       <div class="flex items-center justify-between h-16">
@@ -257,7 +257,7 @@
     </div>
   </nav>
 
-  <!-- Main Content -->
+  
   <div class="login-main mt-12">
     <div class="login-container">
       <div class="login-icon">
@@ -295,7 +295,7 @@
     </div>
   </div>
 
-  <!-- Footer -->
+  
   <footer class="bg-[#34495e] text-white py-12">
     <div class="container mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
@@ -347,7 +347,7 @@
   </footer>
 
   <script>
-    // Toggle password visibility
+   
     document.getElementById('togglePassword').addEventListener('click', function() {
       const passwordInput = document.getElementById('password');
       const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -355,7 +355,7 @@
       this.classList.toggle('fa-eye-slash');
     });
 
-    // Form submission
+    
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
@@ -378,7 +378,7 @@
           resultDiv.className = 'result-message success';
           resultDiv.style.display = 'block';
           
-          // Redirection après 1 seconde
+          
           setTimeout(() => {
             window.location.href = data.redirect || '/created';
           }, 1000);

@@ -1,7 +1,7 @@
 const db = require('../BDD/run');
 
 class QuestionOption {
-  // Pour les questions directes (réponse unique)
+  
   static async create(question_id, answer_text) {
     const [result] = await db.query(
       `INSERT INTO questions_options (question_id, answer_text) 
@@ -11,7 +11,6 @@ class QuestionOption {
     return result.insertId;
   }
 
-  // Pour les QCM (plusieurs options avec indication de correction)
   static async createOptions(question_id, option_text, is_correct = false) {
     const [result] = await db.query(
       `INSERT INTO qcm_options (question_id, option_text, is_correct) 
@@ -21,7 +20,6 @@ class QuestionOption {
     return result.insertId;
   }
 
-  // Méthodes pour récupérer les options/réponses
   static async getDirectAnswer(question_id) {
     const [rows] = await db.query(
       `SELECT correct_answer FROM direct_answers WHERE question_id = ?`,
@@ -41,7 +39,7 @@ class QuestionOption {
     return rows;
   }
 
-  // Méthodes de suppression
+ 
   static async deleteDirectAnswer(question_id) {
     await db.query(
       `DELETE FROM direct_answers WHERE question_id = ?`,

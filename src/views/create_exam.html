@@ -205,7 +205,7 @@
       }
     }
 
-    /* Styles pour le modal */
+    
     .hidden { display: none; }
     .fixed { position: fixed; }
     .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
@@ -240,7 +240,7 @@
     </div>
 
     <section class="exam-grid" id="examList">
-      <!-- Les cartes des examens seront insérées ici -->
+      
     </section>
   </main>
 
@@ -294,7 +294,7 @@
     </div>
   </footer>
 
-  <!-- Modal de création d'examen -->
+  
   <div id="examModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
       <h3 class="text-xl font-semibold mb-4">Créer un nouvel examen</h3>
@@ -350,14 +350,14 @@
       await checkAuth();
       displayExams();
       
-      // Stocker l'ID utilisateur après l'authentification
+     
       const user = await getCurrentUser();
       if (user) {
         localStorage.setItem('currentUser', JSON.stringify(user));
       }
     });
 
-    // Fonction pour récupérer l'utilisateur actuel
+    
     async function getCurrentUser() {
       try {
         const response = await fetch('/api/auth/profile', {
@@ -372,18 +372,18 @@
       return null;
     }
 
-    // Gestion du bouton de création
+   
     document.getElementById('createExamBtn').addEventListener('click', (e) => {
       e.preventDefault();
       document.getElementById('examModal').classList.remove('hidden');
     });
 
-    // Gestion de l'annulation
+    
     document.getElementById('cancelCreateExam').addEventListener('click', () => {
       document.getElementById('examModal').classList.add('hidden');
     });
 
-    // Gestion de la soumission du formulaire
+    
     document.getElementById('createExamForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
@@ -440,7 +440,7 @@
       }
     });
 
-    // Fonction pour vérifier l'authentification
+   
     async function checkAuth() {
       try {
         const response = await fetch('/api/auth/profile', {
@@ -454,7 +454,7 @@
       }
     }
 
-    // Fonction pour afficher les examens
+    
     async function displayExams() {
       try {
         const response = await fetch('/api/created', {
@@ -469,7 +469,7 @@
       }
     }
 
-    // Fonction pour charger les examens dans le DOM
+   
     function loadExams(exams) {
       const container = document.getElementById('examList');
       if (exams.length === 0) {
@@ -499,7 +499,7 @@
         container.appendChild(card);
       });
 
-      // Gestion des boutons "Ajouter des questions"
+      
       document.querySelectorAll('.start-btn').forEach(button => {
         button.addEventListener('click', function() {
           const examId = this.getAttribute('data-exam-id');
@@ -508,7 +508,7 @@
       });
     }
 
-    // Gestion de la déconnexion
+   
     document.getElementById('logoutBtn').addEventListener('click', async () => {
       try {
         await fetch('/api/auth/logout', {
@@ -522,7 +522,7 @@
       }
     });
 
-    // Fonctions d'affichage des messages
+    
     function showError(message) {
       const errorElement = document.getElementById('error-message') || createMessageElement('error-message', 'text-red-500');
       errorElement.textContent = message;

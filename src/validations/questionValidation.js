@@ -1,11 +1,11 @@
-// Avec Joi (exemple courant)
+
 const Joi = require('joi');
 
 const directQuestionSchema = Joi.object({
   exam_id: Joi.string().required(),
   question_type: Joi.string().valid('direct').required(),
   content: Joi.string().required(),
-  answer_text: Joi.string().required(),  // Champ directement à la racine
+  answer_text: Joi.string().required(), 
   tolerance_rate: Joi.number().min(0).max(100),
   duration: Joi.number().min(1).required(),
   score: Joi.number().min(0).required()

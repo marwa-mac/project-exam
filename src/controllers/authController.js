@@ -19,24 +19,22 @@ const authController = {
         field_of_study
       } = req.body;
 
-      // Validation des champs obligatoires
       if (!email || !password || !first_name || !last_name) {
         return res.status(400).json({ 
           message: 'Email, mot de passe, prénom et nom sont obligatoires' 
         });
       }
 
-      // Normalisation
       const normalizedEmail = email.toLowerCase().trim();
       const normalizedPassword = password.normalize('NFKC');
 
-      // Vérification de l'existence de l'utilisateur
+      
       const existingUser = await User.findByEmail(normalizedEmail);
       if (existingUser) {
         return res.status(409).json({ message: 'Cet email est déjà utilisé' });
       }
 
-      // Hachage du mot de passe
+      
       const hashedPassword = await bcrypt.hash(normalizedPassword, 12);
 
       // Création de l'utilisateur avec les données contrôlées
@@ -60,7 +58,7 @@ const authController = {
 
       console.log("Token généré:", token);
 
-      // Définition du cookie HttpOnly
+      
       res.cookie('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -68,7 +66,7 @@ const authController = {
         sameSite: 'strict'
       });
 
-      // Réponse sans le mot de passe
+      
       const { password: _, ...userData } = newUser;
       
       return res.status(201).json({
@@ -96,30 +94,30 @@ const authController = {
     try {
       const { email, password } = req.body;
 
-      // Validation basique
+     
       if (!email || !password) {
         return res.status(400).json({ message: 'Email et mot de passe requis' });
       }
 
-      // Normalisation de l'email
+      
       const normalizedEmail = email.toLowerCase().trim();
 
-      // Récupération de l'utilisateur
+      
       const user = await User.findByEmail(normalizedEmail);
       if (!user) {
         return res.status(401).json({ message: 'Identifiants incorrects' });
       }
 
-      // Normalisation du mot de passe
+    
       const normalizedPassword = password.normalize('NFKC');
 
-      // Comparaison sécurisée
+     
       const isMatch = await bcrypt.compare(normalizedPassword, user.password);
       if (!isMatch) {
         return res.status(401).json({ message: 'Identifiants incorrects' });
       }
 
-      // Génération du token
+      
       const token = jwt.sign(
         { userId: user.id },
         process.env.JWT_SECRET || 'votre_secret_secure',
@@ -128,15 +126,15 @@ const authController = {
 
       console.log("Token généré:", token);
 
-      // Définition du cookie HttpOnly
+     
       res.cookie('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000, // 24 heures
+        maxAge: 24 * 60 * 60 * 1000, 
         sameSite: 'strict'
       });
 
-      // Réponse sans mot de passe
+     
       const { password: _, ...userData } = user;
       
       return res.json({

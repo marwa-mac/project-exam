@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const cookieParser = require('cookie-parser'); // Ajoutez ce package
+const cookieParser = require('cookie-parser'); 
 const app = express();
 const examRoutes = require('./routes/pass_exam');
 const authRoutes = require('./routes/authRoutes');
@@ -11,7 +11,7 @@ const questionsRoutes = require('./routes/questionsRoutes');
 
 // Middleware
 app.use(express.json());
-app.use(cookieParser()); // Pour gérer les cookies
+app.use(cookieParser()); 
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
@@ -19,6 +19,7 @@ app.use('/api/exams', examRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/created', createExamRoutes);
 app.use('/api/examsCreate', createExamRoutes); 
+app.use('/api/questions', questionsRoutes);
 
 
 
@@ -44,10 +45,7 @@ app.get('/created', securePageMiddleware, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'create_exam.html'));
 });
 
-app.use('/api/questions', questionsRoutes);
-
-app.get('/add-questions', (req, res) => {
-    // Vous pouvez utiliser sendFile pour un fichier HTML statique
+app.get('/add-questions', securePageMiddleware, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'add-questions.html'));
     
 });

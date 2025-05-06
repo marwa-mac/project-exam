@@ -254,7 +254,7 @@
     </div>
 
     <section class="exam-grid" id="examList">
-      <!-- Les cartes des examens seront insérées ici -->
+     
     </section>
   </main>
 
@@ -309,21 +309,21 @@
 </footer>
 
   <script>
-    // Vérification de l'authentification au chargement
+    
     document.addEventListener('DOMContentLoaded', async () => {
         await checkAuth();
         loadExams();
     });
 
-    // Fonction pour vérifier si l'utilisateur est connecté
+    
     async function checkAuth() {
         try {
             const response = await fetch('/api/auth/profile', {
-                credentials: 'include' // Important pour les cookies
+                credentials: 'include' 
             });
             
             if (!response.ok) {
-                window.location.href = '/auth'; // Redirection si non authentifié
+                window.location.href = '/auth'; 
             }
         } catch (error) {
             console.error('Erreur vérification auth:', error);
@@ -331,11 +331,11 @@
         }
     }
 
-    // Fonction pour charger les examens (modifiée)
+    
     async function loadExams() {
         try {
             const response = await fetch('/api/exams', {
-                credentials: 'include' // Pour envoyer les cookies
+                credentials: 'include' 
             });
             
             if (!response.ok) {
@@ -354,7 +354,7 @@
         }
     }
 
-    // Gestion de la déconnexion
+    
     document.getElementById('logoutBtn').addEventListener('click', async () => {
         try {
             const response = await fetch('/api/auth/logout', {
@@ -372,7 +372,7 @@
         }
     });
 
-    // Votre fonction displayExams reste inchangée
+   
     function displayExams(exams) {
         const container = document.getElementById('examList');
         

@@ -460,7 +460,7 @@
     </div>
   </div>
 
-  <!-- Footer -->
+  
   <footer class="bg-[#34495e] text-white py-12">
     <div class="container mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
@@ -514,7 +514,7 @@
   <script>
     const API_BASE_URL = 'http://localhost:3000/api/auth';
   
-    // Afficher/masquer le mot de passe
+   
     document.querySelector('.toggle-password').addEventListener('click', function() {
       const passwordField = document.getElementById('password');
       const isPassword = passwordField.type === 'password';
@@ -523,11 +523,11 @@
       this.classList.toggle('fa-eye-slash');
     });
   
-    // Soumission du formulaire
+    
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
       e.preventDefault();
             
-      // Afficher l'état de chargement
+      
       const submitBtn = e.target.querySelector('button[type="submit"]');
       const originalBtnText = submitBtn.innerHTML;
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traitement...';
@@ -536,7 +536,7 @@
       const formData = new FormData(e.target);
       const data = Object.fromEntries(formData.entries());
   
-      // Formater la date si elle existe
+      
       if (data.birth_date) {
         const dateObj = new Date(data.birth_date);
         data.birth_date = dateObj.toISOString().split('T')[0];
@@ -554,13 +554,13 @@
         const result = await response.json();
         const resultElement = document.getElementById('registerResult');
                 
-        // Préparer l'affichage du résultat
+        
         resultElement.className = 'feedback ' + (response.ok ? 'success' : 'error');
         resultElement.textContent = result.message || 
           (response.ok ? 'Inscription réussie ! Redirection vers la page de connexion...' : "Échec de l'inscription");
         resultElement.style.display = 'block';
   
-        // Réinitialiser le formulaire si succès et rediriger après 2 secondes
+        
         if (response.ok) {
           e.target.reset();
           setTimeout(() => {
@@ -573,7 +573,6 @@
         resultElement.textContent = `Erreur: ${error.message || 'Une erreur est survenue'}`;
         resultElement.style.display = 'block';
       } finally {
-        // Réinitialiser le bouton
         submitBtn.innerHTML = originalBtnText;
         submitBtn.disabled = false;
       }

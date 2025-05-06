@@ -1,19 +1,18 @@
 const examModel = require('../models/create_exam');
 
+
 const getAllExams = async (req, res) => {
   try {
-    const exams = await examModel.getAllExams();
+   
+    const userId = req.userId; 
     
-    const formattedExams = exams.map(exam => ({
-      id: exam.id || exam.Id || exam.ID,
-      title: exam.title || exam.Title || exam.TITLE,
-      description: exam.description || exam.Description || exam.DESCRIPTION,
-      targetAudience: exam.targetAudience || exam.TargetAudience || exam.TARGETAUDIENCE, 
-      semestre: exam.semestre || exam.Semestre || exam.SEMESTRE,
-      createdby: exam.createdby || exam.CreatedBy || exam.CREATEDBY,
-    }));
+    if (!userId) {
+      return res.status(401).json({ error: 'Non autorisé' });
+    }
 
-    res.json(formattedExams);
+    const exams = await examModel.getAllExams(userId);
+    
+    res.json(exams);
   } catch (error) {
     res.status(500).json({ 
       error: 'Erreur lors de la récupération des exams',
