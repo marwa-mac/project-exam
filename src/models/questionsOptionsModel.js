@@ -22,10 +22,10 @@ class QuestionOption {
 
   static async getDirectAnswer(question_id) {
     const [rows] = await db.query(
-      `SELECT correct_answer FROM direct_answers WHERE question_id = ?`,
+      `SELECT answer_text FROM questions_options WHERE question_id = ?`,
       [question_id]
     );
-    return rows[0]?.correct_answer;
+    return rows[0]?.answer_text;
   }
 
   static async getQCMOptions(question_id) {
