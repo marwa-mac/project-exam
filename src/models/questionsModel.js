@@ -30,6 +30,31 @@ class Question {
     return rows[0];
   }
 
+  // questionsModel.js
+  static async update(id, { content, media_url, media_type, tolerance_rate, duration, score }) {
+    const query = `
+      UPDATE questions 
+      SET content = ?, 
+          media_url = ?, 
+          media_type = ?, 
+          tolerance_rate = ?, 
+          duration = ?, 
+          score = ?,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    
+    await db.query(query, [
+      content,
+      media_url || null,
+      media_type || null,
+      tolerance_rate || 0,
+      duration,
+      score,
+      id
+    ]);
+  }
+
   static async delete(id) {
     await db.query(
       `DELETE FROM questions WHERE id = ?`,
