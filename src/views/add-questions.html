@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -22,6 +21,10 @@
       font-size: 0.75rem;
       margin-bottom: 0.25rem;
     }
+    .existing-question {
+      border-left: 4px solid #4CAF50;
+      background-color: #f0fff4;
+    }
   </style>
 </head>
 <body class="bg-gray-100">
@@ -29,8 +32,17 @@
     <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-sm p-4">
       <h1 class="text-xl font-bold mb-4 text-center">Création de Questions</h1>
 
+      <!-- Section pour les questions existantes -->
+      <div id="existingQuestionsContainer" class="mb-6">
+        <!-- <h2 class="text-lg font-semibold mb-2 text-gray-700">Questions existantes</h2> -->
+        <div id="existingQuestionsList" class="space-y-3">
+          <!-- Les questions existantes seront chargées ici -->
+        </div>
+      </div>
+
+      <!-- Section pour les nouvelles questions -->
       <div id="questionsContainer" class="space-y-3">
-        <!-- Les questions seront ajoutées ici dynamiquement -->
+        <!-- Les nouvelles questions seront ajoutées ici dynamiquement -->
       </div>
 
       <div class="mt-4 flex flex-wrap gap-3 justify-center">
@@ -48,7 +60,7 @@
   </main>
 
   <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const examId = urlParams.get('exam_id');
     
@@ -59,7 +71,125 @@
     }
   
     let questions = [];
-  
+    let existingQuestions = [];
+
+    // Charger les questions existantes
+    async function loadExistingQuestions() {
+      try {
+        const response = await fetch(`/api/exams/${examId}`, {
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          throw new Error('Erreur lors du chargement des questions existantes');
+        }
+        
+        const data = await response.json();
+        existingQuestions = data.questions || [];
+        renderExistingQuestions();
+      } catch (error) {
+        console.error('Erreur:', error);
+        document.getElementById('existingQuestionsContainer').innerHTML = `
+          <div class="text-red-500 text-sm">
+            <i class="fas fa-exclamation-circle mr-1"></i>
+            Erreur lors du chargement des questions existantes
+          </div>
+        `;
+      }
+    }
+
+    // Afficher les questions existantes
+    function renderExistingQuestions() {
+      const container = document.getElementById('existingQuestionsList');
+      container.innerHTML = '';
+
+      if (existingQuestions.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-4 text-gray-500 text-sm">
+            <i class="fas fa-info-circle mr-1"></i>
+            Aucune question existante pour cet examen
+          </div>
+        `;
+        return;
+      }
+
+      existingQuestions.forEach((question, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'border border-gray-200 p-3 rounded-md bg-white existing-question shadow-xs text-sm';
+        
+        let answersHtml = '';
+        if (question.question_type === 'qcm') {
+          question.answers.forEach((answer, aIndex) => {
+            answersHtml += `
+              <div class="flex items-center gap-2 p-1 ${answer.is_correct ? 'bg-green-50' : 'bg-gray-50'} rounded text-xs">
+                <span class="w-4 h-4 flex items-center justify-center">
+                  ${answer.is_correct ? '✓' : '○'}
+                </span>
+                <span>${answer.option_text || 'Option ' + (aIndex + 1)}</span>
+              </div>
+            `;
+          });
+        } else {
+          answersHtml = `
+            <div class="p-1 bg-blue-50 rounded text-xs">
+              Réponse: ${question.answers.correct_answer || 'Non spécifiée'}
+            </div>
+          `;
+        }
+
+        questionDiv.innerHTML = `
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-medium">
+              <span class="bg-${question.question_type === 'direct' ? 'blue' : 'green'}-500 text-white rounded-full w-5 h-5 flex items-center justify-center mr-2 text-xs inline-block">
+                ${index + 1}
+              </span>
+              ${question.content || 'Question sans texte'}
+            </h3>
+            <button class="text-red-500 hover:text-red-700 delete-existing-question text-xs" data-id="${question.id}">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+          <div class="grid grid-cols-2 gap-2 mb-2 text-xs">
+            <div>
+              <span class="font-medium">Points:</span> ${question.score || 1}
+            </div>
+            <div>
+              <span class="font-medium">Durée:</span> ${question.duration || 60}s
+            </div>
+          </div>
+          <div class="space-y-1">
+            ${answersHtml}
+          </div>
+        `;
+
+        container.appendChild(questionDiv);
+      });
+
+      // Gestion de la suppression des questions existantes
+      document.querySelectorAll('.delete-existing-question').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const questionId = e.target.closest('button').dataset.id;
+          if (confirm('Voulez-vous vraiment supprimer cette question ?')) {
+            try {
+              const response = await fetch(`/api/questions/${questionId}`, {
+                method: 'DELETE',
+                credentials: 'include'
+              });
+              
+              if (response.ok) {
+                loadExistingQuestions(); // Recharger la liste
+              } else {
+                alert('Erreur lors de la suppression');
+              }
+            } catch (error) {
+              console.error('Erreur:', error);
+              alert('Erreur lors de la suppression');
+            }
+          }
+        });
+      });
+    }
+
     // Ajouter une question directe
     document.getElementById('addDirectQuestion').addEventListener('click', () => {
       const questionId = Date.now();
@@ -167,7 +297,7 @@
         
         if (results.every(result => !result.error)) {
           alert('Toutes les questions ont été enregistrées avec succès!');
-          window.location.href = `/exam-details?id=${examId}`;
+          window.location.href = `/exam-details?id=${examId}`; // Redirection vers la page des détails de l'examen
         } else {
           const errors = results.filter(r => r.error).map(r => r.error);
           alert(`Erreurs lors de l'enregistrement:\n${errors.join('\n')}`);
@@ -178,7 +308,7 @@
       }
     });
   
-    // Rendu des questions
+    // Rendu des nouvelles questions
     function renderQuestions() {
       const container = document.getElementById('questionsContainer');
       container.innerHTML = '';
@@ -187,7 +317,7 @@
         container.innerHTML = `
           <div class="text-center py-4 text-gray-500 text-sm">
             <i class="fas fa-question-circle text-2xl mb-1"></i>
-            <p>Aucune question ajoutée</p>
+            <p>Aucune nouvelle question ajoutée</p>
           </div>
         `;
         return;
@@ -432,10 +562,10 @@
       }
     }
 
-    // Initial render
+    // Initialisation
+    loadExistingQuestions();
     renderQuestions();
   });
   </script>
 </body>
 </html>
-

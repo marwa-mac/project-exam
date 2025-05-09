@@ -27,6 +27,7 @@ app.use('/api/questions', questionsRoutes);
 app.use('/api/exam-passing', examPassingRoutes);
 app.use('/api/exam-details', examDetailsRoutes);
 app.use('/api/exam-participation', examParticipationRoutes);
+app.use('/api/exams', createExamRoutes);
 
 
 
