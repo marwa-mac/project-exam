@@ -42,7 +42,7 @@ class QuestionOption {
  
   static async deleteDirectAnswer(question_id) {
     await db.query(
-      `DELETE FROM direct_answers WHERE question_id = ?`,
+      `DELETE FROM questions WHERE id = ?`,
       [question_id]
     );
   }
