@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Passer l'examen - EliteXam</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2c3e50;
+      --secondary: #2980b9;
+      --success: #4CAF50;
+      --danger: #f44336;
+    }
+    .timer {
+      font-family: monospace;
+    }
+    .question-container {
+      transition: opacity 0.3s ease;
+    }
+    #loading, #examContent {
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    #loading.hidden, #examContent.hidden {
+      opacity: 0;
+      visibility: hidden;
+      height: 0;
+      overflow: hidden;
+    }
+    .answer-option input[type="checkbox"] {
+    pointer-events: auto; /* S'assurer que les events ne sont pas bloqués */
+    opacity: 1; /* S'assurer que la checkbox est visible */
+}
+  </style>
+</head>
+<body class="bg-gray-100">
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white p-6">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold">EliteXam</h1>
+      <div class="flex items-center space-x-4">
+        <span id="examTitle" class="font-medium"></span>
+        <span id="timer" class="timer bg-white text-[var(--primary)] px-3 py-1 rounded-lg">00:00:00</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8">
+    <div id="examContainer" class="bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto">
+      <!-- État de chargement -->
+      <div id="loading" class="text-center py-12">
+        <i class="fas fa-spinner fa-spin text-4xl text-[var(--secondary)]"></i>
+        <p class="mt-4 text-gray-600">Chargement de l'examen...</p>
+      </div>
+
+      <!-- Contenu de l'examen (caché initialement) -->
+      <div id="examContent" class="hidden">
+        <!-- Progression -->
+        <div class="mb-6">
+          <div class="flex justify-between mb-1">
+            <span id="progressText" class="text-sm font-medium">Question 1/10</span>
+            <span id="questionTimer" class="timer text-sm font-medium">Temps restant: 00:00</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div id="progressBar" class="bg-[var(--secondary)] h-2.5 rounded-full" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Question -->
+        <div id="questionContainer" class="question-container mb-8">
+          <h2 id="questionText" class="text-xl font-semibold mb-4"></h2>
+          
+          <!-- Options QCM -->
+          <div id="qcmOptions" class="space-y-3 hidden">
+            <!-- Rempli dynamiquement -->
+          </div>
+          
+          <!-- Réponse directe -->
+          <div id="directAnswerContainer" class="hidden">
+            <textarea id="directAnswer" rows="3" 
+              class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[var(--secondary)] focus:outline-none"></textarea>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex justify-between">
+          <button id="prevBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded-lg transition-colors hidden">
+            <i class="fas fa-arrow-left mr-2"></i> Précédent
+          </button>
+          <button id="nextBtn" class="bg-[var(--primary)] hover:bg-[var(--secondary)] text-white py-2 px-6 rounded-lg transition-colors">
+            Suivant <i class="fas fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- État d'erreur (caché initialement) -->
+      <div id="errorState" class="hidden text-center py-12">
+        <i class="fas fa-exclamation-triangle text-4xl text-[var(--danger)] mb-4"></i>
+        <h3 class="text-xl font-bold text-[var(--danger)] mb-2">Erreur de chargement</h3>
+        <p id="errorMessage" class="text-gray-600 mb-6"></p>
+        <button onclick="window.location.href='/exams'" 
+                class="bg-[var(--primary)] hover:bg-[var(--secondary)] text-white py-2 px-6 rounded-lg transition-colors">
+          Retour aux examens
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-[#34495e] text-white py-12 mt-12">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div>
+          <h3 class="text-lg font-semibold mb-4">À propos</h3>
+          <p class="text-gray-400">EliteXam est la plateforme d'examens en ligne leader pour les établissements éducatifs.</p>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Liens rapides</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-400 hover:text-white">Examens</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Résultats</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Support</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-400 hover:text-white">Aide</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Légal</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-400 hover:text-white">Confidentialité</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Conditions</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-gray-700 pt-8 text-center">
+        <p class="text-gray-400">&copy; 2024 EliteXam. Tous droits réservés.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Variables globales
+    let examData = {};
+    let currentQuestionIndex = 0;
+    let userAnswers = {};
+    let examTimer;
+    let questionTimer;
+    let totalTime = 0;
+    let participationId;
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        await checkAuth();
+        await loadExam();
+        setupEventListeners();
+      } catch (error) {
+        showError(error.message);
+      }
+    });
+
+    // Vérification de l'authentification
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/auth/profile', { 
+          credentials: 'include' 
+        });
+        if (!response.ok) {
+          window.location.href = '/auth';
+        }
+      } catch (error) {
+        window.location.href = '/auth';
+      }
+    }
+
+    // Chargement de l'examen
+    async function loadExam() {
+      try {
+        // Récupérer l'ID de participation depuis l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        participationId = urlParams.get('participationId');
+        
+        if (!participationId) {
+          throw new Error('ID de participation manquant dans l\'URL');
+        }
+
+        // Charger les données de l'examen
+        const response = await fetch(`/api/exam-participation/${participationId}`, {
+          credentials: 'include'
+        });
+
+        // Gérer les erreurs HTTP
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Erreur lors du chargement de l\'examen');
+        }
+
+        // Traiter les données reçues
+        const data = await response.json();
+        
+        // Validation des données
+        if (!data.questions || !data.examTitle) {
+          throw new Error('Données de l\'examen incomplètes');
+        }
+
+        // Stocker les données
+        examData = {
+          ...data,
+          questions: data.questions.map(q => ({
+            ...q,
+            duration: q.duration || 60 // Valeur par défaut si non spécifiée
+          }))
+        };
+
+        // Initialiser les réponses utilisateur
+        examData.questions.forEach(q => {
+          userAnswers[q.id] = q.question_type === 'qcm' ? [] : '';
+        });
+
+        // Mettre à jour l'interface
+        document.getElementById('examTitle').textContent = examData.examTitle;
+        
+        // Cacher le loader et afficher le contenu
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('examContent').classList.remove('hidden');
+        
+        // Démarrer les timers
+        startTimers();
+        
+        // Afficher la première question
+        showQuestion(0);
+
+      } catch (error) {
+        console.error('Erreur lors du chargement:', error);
+        showError(error.message || 'Une erreur est survenue');
+      }
+    }
+
+    // Gestion des timers
+    function startTimers() {
+      // Timer global
+      let seconds = 0;
+      examTimer = setInterval(() => {
+        seconds++;
+        totalTime = seconds;
+        updateTimerDisplay(seconds, 'timer');
+      }, 1000);
+
+      // Timer pour la question actuelle
+      resetQuestionTimer();
+    }
+
+    function resetQuestionTimer() {
+      clearInterval(questionTimer);
+      
+      const question = examData.questions[currentQuestionIndex];
+      const questionDuration = question.duration;
+      let seconds = 0;
+
+      questionTimer = setInterval(() => {
+        seconds++;
+        const remaining = questionDuration - seconds;
+        
+        if (remaining <= 0) {
+          clearInterval(questionTimer);
+          document.getElementById('nextBtn').click(); // Passer à la question suivante
+        } else {
+          updateTimerDisplay(remaining, 'questionTimer', 'Temps restant: ');
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay(seconds, elementId, prefix = '') {
+      const hrs = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      
+      document.getElementById(elementId).textContent = 
+        prefix + `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // Affichage des questions
+    function showQuestion(index) {
+      if (index < 0 || index >= examData.questions.length) return;
+      
+      currentQuestionIndex = index;
+      const question = examData.questions[index];
+      
+      // Mettre à jour la progression
+      document.getElementById('progressText').textContent = 
+        `Question ${index + 1}/${examData.questions.length}`;
+      document.getElementById('progressBar').style.width = 
+        `${((index + 1) / examData.questions.length) * 100}%`;
+      
+      // Afficher la question
+      document.getElementById('questionText').textContent = question.content;
+      
+      // Afficher les réponses selon le type de question
+      if (question.question_type === 'qcm') {
+        showQCMOptions(question);
+      } else {
+        showDirectAnswer(question);
+      }
+      
+      // Gérer les boutons de navigation
+      document.getElementById('prevBtn').classList.toggle('hidden', index === 0);
+      document.getElementById('nextBtn').textContent = 
+        index === examData.questions.length - 1 ? 'Terminer' : 'Suivant';
+      
+      // Redémarrer le timer pour cette question
+      resetQuestionTimer();
+    }
+
+    function showQCMOptions(question) {
+  const optionsContainer = document.getElementById('qcmOptions');
+  optionsContainer.innerHTML = '';
+  optionsContainer.classList.remove('hidden');
+  document.getElementById('directAnswerContainer').classList.add('hidden');
+  
+  question.answers.forEach((opt, i) => {
+    const optionElement = document.createElement('div');
+    optionElement.className = 'flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 answer-option';
+    optionElement.dataset.optionId = opt.id;
+    
+    optionElement.innerHTML = `
+      <input type="checkbox" 
+             name="qcmOption" 
+             id="opt${i}" 
+             class="mr-3"
+             ${userAnswers[question.id].includes(opt.id) ? 'checked' : ''}>
+      <label for="opt${i}" class="flex-1 cursor-pointer">${opt.option_text}</label>
+    `;
+    
+    optionsContainer.appendChild(optionElement);
+  });
+}
+
+    function showDirectAnswer(question) {
+      document.getElementById('qcmOptions').classList.add('hidden');
+      document.getElementById('directAnswerContainer').classList.remove('hidden');
+      document.getElementById('directAnswer').value = userAnswers[question.id] || '';
+    }
+
+    // Gestion des réponses
+    function saveCurrentAnswer() {
+      const question = examData.questions[currentQuestionIndex];
+      
+      if (question.question_type === 'qcm') {
+        const selectedOptions = Array.from(
+          document.querySelectorAll('.answer-option input:checked')
+        ).map(input => input.closest('.answer-option').dataset.optionId);
+        
+        userAnswers[question.id] = selectedOptions;
+      } else {
+        userAnswers[question.id] = document.getElementById('directAnswer').value.trim();
+      }
+    }
+
+    // Soumission de l'examen
+    async function submitExam() {
+      try {
+        // Sauvegarder la dernière réponse
+        saveCurrentAnswer();
+        
+        // Préparer les données de soumission
+        const submission = {
+          answers: Object.entries(userAnswers).map(([questionId, answer]) => ({
+            questionId: parseInt(questionId),
+            answer: answer
+          })),
+          totalTime: totalTime
+        };
+
+        // Envoyer les réponses
+        const response = await fetch(`/api/exam-participation/${participationId}/submit`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify(submission)
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Erreur lors de la soumission');
+        }
+
+        // Rediriger vers la page de résultats
+        window.location.href = `/exam-results?participationId=${participationId}`;
+
+      } catch (error) {
+        console.error('Erreur lors de la soumission:', error);
+        showError(error.message || 'Erreur lors de la soumission de l\'examen');
+      }
+    }
+
+    // Gestion des erreurs
+    function showError(message) {
+      // Cacher tout le contenu
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('examContent').classList.add('hidden');
+      
+      // Afficher le message d'erreur
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('errorState').classList.remove('hidden');
+    }
+
+    // Configuration des événements
+    function setupEventListeners() {
+  // Navigation
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    saveCurrentAnswer();
+    showQuestion(currentQuestionIndex - 1);
+  });
+  
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    saveCurrentAnswer();
+    currentQuestionIndex < examData.questions.length - 1
+      ? showQuestion(currentQuestionIndex + 1)
+      : submitExam();
+  });
+  
+  // Modification ici - Gestion simplifiée du clic sur les options
+  document.getElementById('qcmOptions').addEventListener('click', (e) => {
+    // Si on clique directement sur l'input, on ne fait rien (le navigateur gère déjà le changement)
+    if (e.target.tagName === 'INPUT') return;
+    
+    // Si on clique sur le label ou le conteneur, on trouve l'input associé
+    const optionDiv = e.target.closest('.answer-option');
+    if (optionDiv) {
+      const input = optionDiv.querySelector('input');
+      input.checked = !input.checked;
+      
+      // Feedback visuel
+      optionDiv.classList.toggle('bg-blue-50', input.checked);
+    }
+  });
+}
+
+    // Sécurité - Nettoyage des timers
+    window.addEventListener('beforeunload', () => {
+      clearInterval(examTimer);
+      clearInterval(questionTimer);
+    });
+  </script>
+</body>
+</html>W
