@@ -1,30 +1,58 @@
-<div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4">Ajouter des questions</h1>
-    
-    <div id="questionsContainer" class="space-y-6">
-      <!-- Les questions seront ajoutées ici dynamiquement -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Création de Questions</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .compact-input {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+      height: 2rem;
+    }
+    .compact-textarea {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+      min-height: 2.5rem;
+    }
+    .compact-label {
+      font-size: 0.75rem;
+      margin-bottom: 0.25rem;
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <main class="container mx-auto p-2">
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-sm p-4">
+      <h1 class="text-xl font-bold mb-4 text-center">Création de Questions</h1>
+
+      <div id="questionsContainer" class="space-y-3">
+        <!-- Les questions seront ajoutées ici dynamiquement -->
+      </div>
+
+      <div class="mt-4 flex flex-wrap gap-3 justify-center">
+        <button id="addDirectQuestion" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded-md transition text-sm">
+          <i class="fas fa-plus mr-1"></i>Question Directe
+        </button>
+        <button id="addQCMQuestion" class="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded-md transition text-sm">
+          <i class="fas fa-list-ol mr-1"></i>Question QCM
+        </button>
+        <button id="saveAllQuestions" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-1 rounded-md transition text-sm">
+          <i class="fas fa-save mr-1"></i>Enregistrer Tout
+        </button>
+      </div>
     </div>
-  
-    <div class="mt-6 space-x-4">
-      <button id="addDirectQuestion" class="bg-blue-500 text-white px-4 py-2 rounded">
-        Ajouter une question directe
-      </button>
-      <button id="addQCMQuestion" class="bg-green-500 text-white px-4 py-2 rounded">
-        Ajouter un QCM
-      </button>
-      <button id="saveAllQuestions" class="bg-purple-500 text-white px-4 py-2 rounded">
-        Enregistrer toutes les questions
-      </button>
-    </div>
-  </div>
-  
+  </main>
+
   <script>
   document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const examId = urlParams.get('exam_id');
     
     if (!examId) {
-      alert('Exam ID is missing');
+      alert('ID d\'examen manquant');
       window.location.href = '/exams';
       return;
     }
@@ -39,13 +67,14 @@
         type: 'direct',
         exam_id: examId,
         content: '',
+        answer_text: '',
         tolerance_rate: 0,
         duration: 60,
-        score: 1,
-        options: [{ answer_text: '' }]
+        score: 1
       });
       
       renderQuestions();
+      scrollToQuestion(questionId);
     });
   
     // Ajouter un QCM
@@ -59,43 +88,88 @@
         duration: 60,
         score: 1,
         options: [
-          { answer_text: '' },
-          { answer_text: '' }
+          { option_text: '', is_correct: true },
+          { option_text: '', is_correct: false }
         ]
       });
       
       renderQuestions();
+      scrollToQuestion(questionId);
     });
   
     // Enregistrer toutes les questions
     document.getElementById('saveAllQuestions').addEventListener('click', async () => {
       try {
+        // Validation avant envoi
+        if (questions.length === 0) {
+          alert('Veuillez ajouter au moins une question');
+          return;
+        }
+
+        for (const question of questions) {
+          if (!question.content.trim()) {
+            alert('Veuillez remplir le texte de toutes les questions');
+            return;
+          }
+
+          if (question.type === 'qcm') {
+            const emptyOptions = question.options.some(opt => !opt.option_text.trim());
+            if (emptyOptions) {
+              alert('Veuillez remplir toutes les options des QCM');
+              return;
+            }
+
+            const correctOptions = question.options.filter(opt => opt.is_correct).length;
+            if (correctOptions === 0) {
+              alert('Veuillez sélectionner au moins une réponse correcte pour chaque QCM');
+              return;
+            }
+          } else if (question.type === 'direct') {
+            if (!question.answer_text.trim()) {
+              alert('Veuillez remplir la réponse pour les questions directes');
+              return;
+            }
+          }
+        }
+
+        // Envoi des données
         const responses = await Promise.all(
-          questions.map(question => 
-            fetch('/api/questions', {
+          questions.map(question => {
+            const payload = {
+              exam_id: question.exam_id,
+              question_type: question.type,
+              content: question.content,
+              duration: question.duration,
+              score: question.score
+            };
+
+            if (question.type === 'direct') {
+              payload.tolerance_rate = question.tolerance_rate;
+              payload.answer_text = question.answer_text;
+            } else {
+              payload.options = question.options;
+            }
+
+            return fetch('/api/questions', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                exam_id: question.exam_id,
-                question_type: question.type,
-                content: question.content,
-                tolerance_rate: question.tolerance_rate,
-                duration: question.duration,
-                score: question.score,
-                options: question.options
-              }),
+              headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+              },
+              body: JSON.stringify(payload),
               credentials: 'include'
-            })
-          )
+            });
+          })
         );
   
         const results = await Promise.all(responses.map(res => res.json()));
         
-        if (results.every(result => result.message === 'Question created successfully')) {
+        if (results.every(result => !result.error)) {
           alert('Toutes les questions ont été enregistrées avec succès!');
           window.location.href = `/exam-details?id=${examId}`;
         } else {
-          alert('Certaines questions n\'ont pas pu être enregistrées');
+          const errors = results.filter(r => r.error).map(r => r.error);
+          alert(`Erreurs lors de l'enregistrement:\n${errors.join('\n')}`);
         }
       } catch (error) {
         console.error('Error saving questions:', error);
@@ -108,83 +182,143 @@
       const container = document.getElementById('questionsContainer');
       container.innerHTML = '';
   
+      if (questions.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-4 text-gray-500 text-sm">
+            <i class="fas fa-question-circle text-2xl mb-1"></i>
+            <p>Aucune question ajoutée</p>
+          </div>
+        `;
+        return;
+      }
+  
       questions.forEach((question, qIndex) => {
         const questionDiv = document.createElement('div');
-        questionDiv.className = 'border p-4 rounded-lg bg-white shadow';
+        questionDiv.className = 'border border-gray-200 p-3 rounded-md bg-white shadow-xs hover:shadow-sm transition text-sm';
+        questionDiv.id = `question-${question.id}`;
         
         // En-tête de la question
         questionDiv.innerHTML = `
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="font-semibold">Question ${qIndex + 1} (${question.type === 'direct' ? 'Directe' : 'QCM'})</h3>
-            <button class="text-red-500 delete-question" data-id="${question.id}">Supprimer</button>
+          <div class="flex justify-between items-center mb-2 pb-1 border-b">
+            <h3 class="font-medium flex items-center text-sm">
+              <span class="bg-${question.type === 'direct' ? 'blue' : 'green'}-500 text-white rounded-full w-5 h-5 flex items-center justify-center mr-2 text-xs">
+                ${qIndex + 1}
+              </span>
+              Question ${qIndex + 1} (${question.type === 'direct' ? 'Directe' : 'QCM'})
+            </h3>
+            <button class="text-red-500 hover:text-red-700 delete-question text-xs" data-id="${question.id}">
+              <i class="fas fa-trash"></i>
+            </button>
           </div>
-          <div class="mb-4">
-            <label class="block mb-2">Question:</label>
-            <textarea class="w-full p-2 border rounded question-content" data-id="${question.id}"
-              placeholder="Entrez votre question ici">${question.content}</textarea>
-          </div>
-          <div class="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label class="block mb-2">Durée (secondes):</label>
-              <input type="number" class="w-full p-2 border rounded question-duration" data-id="${question.id}"
-                value="${question.duration}">
-            </div>
-            <div>
-              <label class="block mb-2">Score:</label>
-              <input type="number" class="w-full p-2 border rounded question-score" data-id="${question.id}"
-                value="${question.score}">
-            </div>
+          <div class="mb-2">
+            <label class="block mb-1 font-medium compact-label">Texte de la question:</label>
+            <textarea class="w-full border rounded-md question-content focus:ring-1 focus:ring-blue-500 focus:border-transparent compact-textarea" 
+              data-id="${question.id}"
+              placeholder="Écrivez votre question ici..."
+              rows="1">${question.content}</textarea>
           </div>
         `;
-  
-        // Ajout du champ de tolérance pour les questions directes
+
+        // Champs spécifiques selon le type de question
         if (question.type === 'direct') {
           questionDiv.innerHTML += `
-            <div class="mb-4">
-              <label class="block mb-2">Taux de tolérance (%):</label>
-              <input type="number" class="w-full p-2 border rounded question-tolerance" data-id="${question.id}"
-                value="${question.tolerance_rate}" min="0" max="100">
+            <div class="grid grid-cols-3 gap-2 mb-2">
+              <div>
+                <label class="block mb-1 font-medium compact-label">Points:</label>
+                <input type="number" min="1" class="w-full border rounded-md question-score focus:ring-1 focus:ring-blue-500 focus:border-transparent compact-input" 
+                  data-id="${question.id}"
+                  value="${question.score}">
+              </div>
+              <div>
+                <label class="block mb-1 font-medium compact-label">Tolérance (%):</label>
+                <input type="number" min="0" max="100" class="w-full border rounded-md question-tolerance focus:ring-1 focus:ring-blue-500 focus:border-transparent compact-input" 
+                  data-id="${question.id}"
+                  value="${question.tolerance_rate}">
+              </div>
+              <div>
+                <label class="block mb-1 font-medium compact-label">Durée (s):</label>
+                <input type="number" min="1" class="w-full border rounded-md question-duration focus:ring-1 focus:ring-blue-500 focus:border-transparent compact-input" 
+                  data-id="${question.id}"
+                  value="${question.duration}">
+              </div>
+            </div>
+            <div class="mb-2">
+              <label class="block mb-1 font-medium compact-label">Réponse:</label>
+              <input type="text" 
+                class="w-full border rounded-md answer-text focus:ring-1 focus:ring-blue-500 focus:border-transparent compact-input" 
+                data-qid="${question.id}"
+                value="${question.answer_text}" 
+                placeholder="Réponse correcte">
             </div>
           `;
-        }
-  
-        // Options de réponse
-        const optionsDiv = document.createElement('div');
-        optionsDiv.className = 'space-y-3 mb-4';
-        optionsDiv.innerHTML = `<label class="block mb-2">${question.type === 'direct' ? 'Réponse correcte' : 'Options de réponse'}:</label>`;
-  
-        question.options.forEach((option, oIndex) => {
-          const optionDiv = document.createElement('div');
-          optionDiv.className = 'flex items-center';
-          optionDiv.innerHTML = `
-            <input type="${question.type === 'direct' ? 'text' : 'text'}" 
-              class="flex-1 p-2 border rounded option-answer" 
-              data-qid="${question.id}" data-oid="${oIndex}"
-              value="${option.answer_text}" 
-              placeholder="${question.type === 'direct' ? 'Entrez la réponse correcte' : 'Option ' + (oIndex + 1)}">
-            ${question.type === 'qcm' ? `
-              <button class="ml-2 text-red-500 delete-option" data-qid="${question.id}" data-oid="${oIndex}">
-                Supprimer
-              </button>
-            ` : ''}
+        } else {
+          // QCM - Points et Durée seulement
+          questionDiv.innerHTML += `
+            <div class="grid grid-cols-2 gap-2 mb-2">
+              <div>
+                <label class="block mb-1 font-medium compact-label">Points:</label>
+                <input type="number" min="1" class="w-full border rounded-md question-score focus:ring-1 focus:ring-blue-500 focus:border-transparent compact-input" 
+                  data-id="${question.id}"
+                  value="${question.score}">
+              </div>
+              <div>
+                <label class="block mb-1 font-medium compact-label">Durée (s):</label>
+                <input type="number" min="1" class="w-full border rounded-md question-duration focus:ring-1 focus:ring-blue-500 focus:border-transparent compact-input" 
+                  data-id="${question.id}"
+                  value="${question.duration}">
+              </div>
+            </div>
           `;
-          optionsDiv.appendChild(optionDiv);
-        });
-  
-        // Bouton pour ajouter une option (QCM seulement)
-        if (question.type === 'qcm') {
+
+          // Options de réponse pour QCM
+          const optionsDiv = document.createElement('div');
+          optionsDiv.className = 'space-y-1 mb-2';
+          optionsDiv.innerHTML = `
+            <label class="block mb-1 font-medium compact-label">Options:</label>
+          `;
+          
+          question.options.forEach((option, oIndex) => {
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'flex items-center gap-1 p-1 bg-gray-50 rounded-md text-xs';
+            optionDiv.innerHTML = `
+              <input type="checkbox" 
+                class="w-3 h-3 checkbox-option text-green-500 focus:ring-green-500" 
+                data-qid="${question.id}" 
+                data-oid="${oIndex}"
+                ${option.is_correct ? 'checked' : ''}>
+              
+              <input type="text" 
+                class="flex-1 border rounded-md option-text focus:ring-1 focus:ring-blue-500 focus:border-transparent compact-input" 
+                data-qid="${question.id}" 
+                data-oid="${oIndex}"
+                value="${option.option_text}" 
+                placeholder="Option ${oIndex + 1}">
+              
+              <button class="text-red-500 hover:text-red-700 delete-option text-xs" data-qid="${question.id}" data-oid="${oIndex}">
+                <i class="fas fa-times"></i>
+              </button>
+            `;
+            optionsDiv.appendChild(optionDiv);
+          });
+          
           optionsDiv.innerHTML += `
-            <button class="mt-2 text-blue-500 add-option" data-qid="${question.id}">
-              + Ajouter une option
+            <button class="mt-1 text-blue-500 hover:text-blue-700 add-option flex items-center text-xs" data-qid="${question.id}">
+              <i class="fas fa-plus-circle mr-1"></i> Ajouter option
             </button>
           `;
+          
+          questionDiv.appendChild(optionsDiv);
         }
-  
-        questionDiv.appendChild(optionsDiv);
+
         container.appendChild(questionDiv);
       });
-  
+
       // Gestion des événements
+      setupEventListeners();
+    }
+
+    function setupEventListeners() {
+      // Contenu de la question
       document.querySelectorAll('.question-content').forEach(el => {
         el.addEventListener('input', (e) => {
           const questionId = parseInt(e.target.dataset.id);
@@ -192,23 +326,26 @@
           if (question) question.content = e.target.value;
         });
       });
-  
+
+      // Durée
       document.querySelectorAll('.question-duration').forEach(el => {
         el.addEventListener('input', (e) => {
           const questionId = parseInt(e.target.dataset.id);
           const question = questions.find(q => q.id === questionId);
-          if (question) question.duration = parseInt(e.target.value) || 0;
+          if (question) question.duration = parseInt(e.target.value) || 60;
         });
       });
-  
+
+      // Score
       document.querySelectorAll('.question-score').forEach(el => {
         el.addEventListener('input', (e) => {
           const questionId = parseInt(e.target.dataset.id);
           const question = questions.find(q => q.id === questionId);
-          if (question) question.score = parseInt(e.target.value) || 0;
+          if (question) question.score = parseInt(e.target.value) || 1;
         });
       });
-  
+
+      // Tolérance (questions directes)
       document.querySelectorAll('.question-tolerance').forEach(el => {
         el.addEventListener('input', (e) => {
           const questionId = parseInt(e.target.dataset.id);
@@ -216,28 +353,52 @@
           if (question) question.tolerance_rate = parseInt(e.target.value) || 0;
         });
       });
-  
-      document.querySelectorAll('.option-answer').forEach(el => {
+
+      // Réponse directe
+      document.querySelectorAll('.answer-text').forEach(el => {
+        el.addEventListener('input', (e) => {
+          const questionId = parseInt(e.target.dataset.qid);
+          const question = questions.find(q => q.id === questionId);
+          if (question) question.answer_text = e.target.value;
+        });
+      });
+
+      // Options QCM
+      document.querySelectorAll('.option-text').forEach(el => {
         el.addEventListener('input', (e) => {
           const questionId = parseInt(e.target.dataset.qid);
           const optionIndex = parseInt(e.target.dataset.oid);
           const question = questions.find(q => q.id === questionId);
-          if (question) question.options[optionIndex].answer_text = e.target.value;
+          if (question) question.options[optionIndex].option_text = e.target.value;
         });
       });
-  
+
+      // Checkboxes QCM
+      document.querySelectorAll('.checkbox-option').forEach(el => {
+        el.addEventListener('change', (e) => {
+          const questionId = parseInt(e.target.dataset.qid);
+          const optionIndex = parseInt(e.target.dataset.oid);
+          const question = questions.find(q => q.id === questionId);
+          if (question) {
+            question.options[optionIndex].is_correct = e.target.checked;
+          }
+        });
+      });
+
+      // Suppression de question
       document.querySelectorAll('.delete-question').forEach(btn => {
         btn.addEventListener('click', (e) => {
-          const questionId = parseInt(e.target.dataset.id);
+          const questionId = parseInt(e.target.closest('button').dataset.id);
           questions = questions.filter(q => q.id !== questionId);
           renderQuestions();
         });
       });
-  
+
+      // Suppression d'option (QCM)
       document.querySelectorAll('.delete-option').forEach(btn => {
         btn.addEventListener('click', (e) => {
-          const questionId = parseInt(e.target.dataset.qid);
-          const optionIndex = parseInt(e.target.dataset.oid);
+          const questionId = parseInt(e.target.closest('button').dataset.qid);
+          const optionIndex = parseInt(e.target.closest('button').dataset.oid);
           const question = questions.find(q => q.id === questionId);
           
           if (question && question.options.length > 2) {
@@ -248,18 +409,31 @@
           }
         });
       });
-  
+
+      // Ajout d'option (QCM)
       document.querySelectorAll('.add-option').forEach(btn => {
         btn.addEventListener('click', (e) => {
-          const questionId = parseInt(e.target.dataset.qid);
+          const questionId = parseInt(e.target.closest('button').dataset.qid);
           const question = questions.find(q => q.id === questionId);
           
           if (question) {
-            question.options.push({ answer_text: '' });
+            question.options.push({ option_text: '', is_correct: false });
             renderQuestions();
           }
         });
       });
     }
+
+    function scrollToQuestion(questionId) {
+      const element = document.getElementById(`question-${questionId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    // Initial render
+    renderQuestions();
   });
   </script>
+</body>
+</html>
