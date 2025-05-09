@@ -2,17 +2,17 @@ const Question = require('../models/questionsModel');
 const QuestionOption = require('../models/questionsOptionsModel');
 
 const questionsController = {
-  // Créer une nouvelle question avec ses réponses
+  
   createQuestion: async (req, res) => {
     try {
       const { exam_id, question_type, content, answer_text, media_url, media_type, tolerance_rate, duration, score, options } = req.body;
 
-      // Validation des données de base
+      
       if (!exam_id || !question_type || !content || !duration || !score) {
         return res.status(400).json({ error: 'Champs requis manquants' });
       }
 
-      // Création de la question
+      
       const questionId = await Question.create({
         exam_id,
         question_type,
@@ -24,9 +24,9 @@ const questionsController = {
         score
       });
 
-      // Gestion des réponses selon le type de question
+      
       if (question_type === 'direct') {
-        // Validation pour les questions directes
+        
         if (!answer_text) {
           await Question.delete(questionId);
           return res.status(400).json({ 
@@ -34,11 +34,11 @@ const questionsController = {
           });
         }
 
-        // Création de la réponse directe
+        
         await QuestionOption.create(questionId, answer_text);
       } 
       else if (question_type === 'qcm') {
-        // Validation pour les QCM
+   
         if (!options || options.length < 2) {
           await Question.delete(questionId);
           return res.status(400).json({ 
@@ -46,7 +46,7 @@ const questionsController = {
           });
         }
 
-        // Vérifier qu'au moins une option est correcte
+        
         const hasCorrectAnswer = options.some(opt => opt.is_correct);
         if (!hasCorrectAnswer) {
           await Question.delete(questionId);
@@ -55,7 +55,7 @@ const questionsController = {
           });
         }
 
-        // Création des options QCM
+       
         for (const option of options) {
           await QuestionOption.createOptions(
             questionId, 
@@ -72,7 +72,7 @@ const questionsController = {
     } catch (error) {
       console.error('Erreur lors de la création de la question:', error);
       
-      // Gestion spécifique des erreurs de contrainte SQL
+      
       if (error.code === 'ER_NO_REFERENCED_ROW_2') {
         return res.status(400).json({ 
           error: 'L\'examen spécifié n\'existe pas' 
@@ -86,14 +86,14 @@ const questionsController = {
     }
   },
 
-  // Récupérer toutes les questions d'un examen
+ 
   getQuestionsByExamId: async (req, res) => {
     try {
       const { exam_id } = req.params;
 
       const questions = await Question.findByExamId(exam_id);
 
-      // Pour chaque question, récupérer les options/réponses
+      
       const questionsWithOptions = await Promise.all(
         questions.map(async (question) => {
           let responseOptions;
@@ -121,18 +121,18 @@ const questionsController = {
     }
   },
 
-  // Supprimer une question
+  
   deleteQuestion: async (req, res) => {
     try {
       const { id } = req.params;
 
-      // Vérifier que la question existe
+      
       const question = await Question.findById(id);
       if (!question) {
         return res.status(404).json({ error: 'Question non trouvée' });
       }
 
-      // Supprimer d'abord les options/réponses puis la question
+      
       await QuestionOption.deleteByQuestionId(id);
       await Question.delete(id);
 
@@ -146,19 +146,19 @@ const questionsController = {
     }
   },
 
-  // Mettre à jour une question
+  
   updateQuestion: async (req, res) => {
     try {
       const { id } = req.params;
       const { content, answer_text, tolerance_rate, duration, score, options } = req.body;
 
-      // Vérifier que la question existe
+      
       const question = await Question.findById(id);
       if (!question) {
         return res.status(404).json({ error: 'Question non trouvée' });
       }
 
-      // Mise à jour des champs de base
+     
       await Question.update(id, {
         content,
         tolerance_rate,
@@ -166,7 +166,7 @@ const questionsController = {
         score
       });
 
-      // Mise à jour des réponses selon le type
+     
       if (question.question_type === 'direct') {
         if (!answer_text) {
           return res.status(400).json({ 
