@@ -1,409 +1,148 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Plateforme Étudiant - Examens</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Passer un examen - EliteXam</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     :root {
       --primary: #2c3e50;
       --secondary: #2980b9;
       --accent: #e74c3c;
       --light: #f9f9f9;
-      --text: #2d3436;
-      --blue-light: #d0e6ff;
     }
-
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--light);
-      color: var(--text);
-    }
-
-    header {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: #fff;
-      padding: 1.5rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    /* .avatar {
-      background: #fff;
-      color: var(--primary);
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: bold;
-    } */
-
-    .container {
-      max-width: 1200px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
-
-    .page-title {
-      font-size: 1.8rem;
-      margin-bottom: 1rem;
-      position: relative;
-      font-weight: 600;
-    }
-
-    .page-title::after {
-      content: "";
-      position: absolute;
-      width: 60px;
-      height: 3px;
-      background: var(--secondary);
-      bottom: -6px;
-      left: 0;
-    }
-
-    .filter-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 2rem;
-    }
-
-    .filter-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      flex: 1;
-    }
-
-    .filter-controls input,
-    .filter-controls select {
-      padding: 0.7rem;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-
-    .filter-controls input {
-      min-width: 250px;
-      flex-grow: 1;
-    }
-
-    .filter-controls select {
-      min-width: 150px;
-    }
-
-    .create-exam-btn {
-      background: var(--secondary);
-      color: white;
-      padding: 0.7rem 1.2rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      white-space: nowrap;
-      flex-shrink: 0;
-      transition: background 0.3s;
-    }
-
-    .create-exam-btn:hover {
-      background: var(--primary);
-    }
-
-    .exam-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-      animation: fadeIn 0.6s ease-in;
-    }
-
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(10px);}
-      to {opacity: 1; transform: translateY(0);}
-    }
-
-    .card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      transition: transform 0.3s ease;
-    }
-
     .card:hover {
-      transform: translateY(-4px);
-    }
-
-    .card-header {
-      background: var(--secondary);
-      color: white;
-      padding: 1rem 1.2rem;
-    }
-
-    .card-header h2 {
-      margin: 0;
-      font-size: 1.2rem;
-    }
-
-    .card-body {
-      padding: 1.2rem;
-      flex: 1;
-    }
-
-    .exam-meta {
-      font-size: 0.95rem;
-      margin-bottom: 1rem;
-    }
-
-    .exam-meta div {
-      margin-bottom: 0.4rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .exam-meta i {
-      color: var(--secondary);
-    }
-
-    .time-remaining {
-      background: var(--blue-light);
-      padding: 0.6rem;
-      border-radius: 6px;
-      color: #2c3e50;
-      font-weight: 500;
-      margin-bottom: 1rem;
-    }
-
-    .start-btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 0.8rem;
-      border-radius: 8px;
-      cursor: pointer;
-      width: 100%;
-      font-weight: 500;
-      font-size: 1rem;
-      transition: background 0.3s;
-    }
-
-    .start-btn:hover {
-      background: var(--secondary);
-    }
-
-    @media (max-width: 768px) {
-      .filter-bar {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .filter-controls {
-        width: 100%;
-      }
-
-      .create-exam-btn {
-        width: 100%;
-        margin-top: 0.5rem;
-      }
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     }
   </style>
 </head>
-<body>
-
-  <header>
-    <h1>EliteXam</h1>
-    <div class="flex items-center space-x-4">
-      <a href="/created" class="text-gray-300 hover:text-white transition-colors">Mes examens</a>
-        <a href="/exams" class="text-white transition-colors">Examens</a>
-        <button id="logoutBtn" class="text-gray-300 hover:text-white transition-colors cursor-pointer">
-            Déconnexion
-        </button>
+<body class="bg-gray-50">
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white p-6">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold">EliteXam</h1>
+      <nav class="flex items-center space-x-6">
+        <a href="/created" class="hover:text-gray-200">Mes examens</a>
+        <a href="/exams" class="font-semibold">Passer un examen</a>
+        <button id="logoutBtn" class="hover:text-gray-200">Déconnexion</button>
+      </nav>
     </div>
-</header>
+  </header>
 
-  <main class="container">
-    <h2 class="page-title">Examens Disponibles</h2>
+  <main class="container mx-auto px-4 py-8">
+    <h2 class="text-3xl font-bold mb-6 relative pb-2">
+      Examens disponibles
+      <span class="absolute bottom-0 left-0 w-16 h-1 bg-[var(--secondary)]"></span>
+    </h2>
 
-    <div class="filter-bar">
-      <div class="filter-controls">
-        <input type="text" id="searchInput" placeholder="Rechercher un examen...">
-        <!-- <select>
-          <option>Toutes les filières</option>
-          <option>SMI</option>
-          <option>SMP</option>
-        </select>
-        <select>
-          <option>Tous les semestres</option>
-          <option>Semestre 1</option>
-          <option>Semestre 2</option>
-          <option>Semestre 3</option>
-          <option>Semestre 4</option>
-          <option>Semestre 5</option>
-        </select> -->
-      </div>
+    <div class="mb-8 flex flex-col md:flex-row gap-4">
+      <input type="text" id="searchInput" placeholder="Rechercher un examen..." 
+             class="flex-grow p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--secondary)]">
     </div>
 
-    <section class="exam-grid" id="examList">
-     
-    </section>
+    <div id="examList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Les examens seront chargés ici -->
+    </div>
   </main>
 
-  <footer class="bg-[#34495e] text-white py-12">
+  <!-- Footer -->
+  <footer class="bg-[#34495e] text-white py-12 mt-12">
     <div class="container mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div>
-                <h3 class="text-lg font-semibold mb-4">À propos</h3>
-                <p class="text-gray-400">ExamManager Pro est la solution leader pour la gestion des examens en milieu éducatif.</p>
-            </div>
-            <div>
-                <h3 class="text-lg font-semibold mb-4">Liens rapides</h3>
-                <ul class="space-y-2">
-                    <li><a href="#features" class="text-gray-400 hover:text-white">Fonctionnalités</a></li>
-                    <li><a href="#demo" class="text-gray-400 hover:text-white">Démonstration</a></li>
-                </ul>
-            </div>
-            <div>
-                <h3 class="text-lg font-semibold mb-4">Support</h3>
-                <ul class="space-y-2">
-                    <li><a href="#help" class="text-gray-400 hover:text-white">Centre d'aide</a></li>
-                    <li><a href="#contact" class="text-gray-400 hover:text-white">Contact</a></li>
-                    <li><a href="#docs" class="text-gray-400 hover:text-white">Documentation</a></li>
-                </ul>
-            </div>
-            <div>
-                <h3 class="text-lg font-semibold mb-4">Légal</h3>
-                <ul class="space-y-2">
-                    <li><a href="#privacy" class="text-gray-400 hover:text-white">Confidentialité</a></li>
-                    <li><a href="#terms" class="text-gray-400 hover:text-white">Conditions</a></li>
-                    <li><a href="#gdpr" class="text-gray-400 hover:text-white">RGPD</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="border-t border-gray-700 pt-8">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-400">&copy; 2024 ExamManager Pro. Tous droits réservés.</p>
-                <div class="flex space-x-6 mt-4 md:mt-0">
-                    <a href="#twitter" class="text-gray-400 hover:text-white">
-                        <i data-lucide="twitter" class="h-5 w-5"></i>
-                    </a>
-                    <a href="#linkedin" class="text-gray-400 hover:text-white">
-                        <i data-lucide="linkedin" class="h-5 w-5"></i>
-                    </a>
-                    <a href="#facebook" class="text-gray-400 hover:text-white">
-                        <i data-lucide="facebook" class="h-5 w-5"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
+      <!-- ... (même footer que précédemment) ... -->
     </div>
-</footer>
+  </footer>
 
   <script>
-    
     document.addEventListener('DOMContentLoaded', async () => {
-        await checkAuth();
-        loadExams();
+      await checkAuth();
+      loadExams();
+      
+      // Gestion de la déconnexion
+      document.getElementById('logoutBtn').addEventListener('click', async () => {
+        try {
+          await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+          window.location.href = '/auth';
+        } catch (error) {
+          console.error('Erreur déconnexion:', error);
+        }
+      });
     });
 
-    
     async function checkAuth() {
-        try {
-            const response = await fetch('/api/auth/profile', {
-                credentials: 'include' 
-            });
-            
-            if (!response.ok) {
-                window.location.href = '/auth'; 
-            }
-        } catch (error) {
-            console.error('Erreur vérification auth:', error);
-            window.location.href = '/auth';
-        }
+      try {
+        const response = await fetch('/api/auth/profile', { credentials: 'include' });
+        if (!response.ok) window.location.href = '/auth';
+      } catch (error) {
+        window.location.href = '/auth';
+      }
     }
 
-    
     async function loadExams() {
-        try {
-            const response = await fetch('/api/exams', {
-                credentials: 'include' 
-            });
-            
-            if (!response.ok) {
-                if (response.status === 401) {
-                    window.location.href = '/auth';
-                    return;
-                }
-                throw new Error('Erreur lors du chargement des examens');
-            }
-
-            const exams = await response.json();
-            displayExams(exams);
-        } catch (error) {
-            console.error('Erreur:', error);
-            alert("Une erreur est survenue lors du chargement des examens");
-        }
-    }
-
-    
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-        try {
-            const response = await fetch('/api/auth/logout', {
-                method: 'POST',
-                credentials: 'include'
-            });
-            
-            if (response.ok) {
-                window.location.href = '/auth';
-            } else {
-                alert('Échec de la déconnexion');
-            }
-        } catch (error) {
-            console.error('Erreur déconnexion:', error);
-        }
-    });
-
-   
-    function displayExams(exams) {
-        const container = document.getElementById('examList');
+      try {
+        const response = await fetch('/api/exams', { credentials: 'include' });
+        if (!response.ok) throw new Error('Erreur chargement examens');
         
-        if (exams.length === 0) {
-            container.innerHTML = '<p class="text-center text-subtext col-span-full">Aucun examen trouvé</p>';
-            return;
-        }
-
-        container.innerHTML = '';
-
-        exams.forEach(exam => {
-            const card = document.createElement('article');
-            card.className = 'card';
-            card.innerHTML = `
-                <div class="card-header">
-                    <h2>${exam.title || 'Non défini'}</h2>
-                </div>
-                <div class="card-body">
-                    <div class="exam-meta">
-                        <div class="exam-description">${exam.description || 'Aucune description disponible'}</div>
-                        <div><i class="fa-solid fa-graduation-cap"></i> Filière : ${exam.targetAudience || 'none'}</div>
-                        <div><i class="fa-solid fa-calendar-days"></i> Semestre : ${exam.semestre || 'Inconnu'}</div>
-                        <div><i class="fa-solid fa-clock"></i> Limite : ${exam.dateLimit || 'Non définie'}</div>
-                    </div>
-                    <button class="start-btn">Commencer l'examen</button>
-                </div>
-            `;
-            container.appendChild(card);
-        });
+        const exams = await response.json();
+        displayExams(exams);
+      } catch (error) {
+        console.error('Erreur:', error);
+        alert("Erreur lors du chargement des examens");
+      }
     }
-</script>
 
+    function displayExams(exams) {
+      const container = document.getElementById('examList');
+      container.innerHTML = exams.length === 0 
+        ? '<p class="text-center col-span-full">Aucun examen disponible</p>'
+        : exams.map(exam => `
+          <div class="card bg-white rounded-xl shadow-md overflow-hidden transition-transform duration-300">
+            <div class="bg-[var(--secondary)] text-white p-4">
+              <h3 class="text-xl font-semibold">${exam.title}</h3>
+            </div>
+            <div class="p-6">
+              <p class="text-gray-600 mb-4">${exam.description || 'Aucune description'}</p>
+              <div class="space-y-2 text-sm mb-6">
+                <p><i class="fas fa-users mr-2 text-[var(--secondary)]"></i> ${exam.targetAudience || 'Non spécifié'}</p>
+                <p><i class="fas fa-calendar-alt mr-2 text-[var(--secondary)]"></i> ${exam.semestre || 'Non spécifié'}</p>
+              </div>
+              <button onclick="startExam(${exam.id})" class="w-full bg-[var(--primary)] hover:bg-[var(--secondary)] text-white py-2 rounded-lg transition-colors">
+                Commencer l'examen
+              </button>
+            </div>
+          </div>
+        `).join('');
+    }
+
+    async function startExam(examId) {
+      try {
+        // Obtenir la localisation
+        const position = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+        });
+        
+        const { latitude, longitude } = position.coords;
+        
+        // Démarrer l'examen
+        const response = await fetch(`/api/exam-passing/start/${examId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ latitude, longitude })
+        });
+        
+        if (!response.ok) throw new Error(await response.text());
+        
+        const { participationId } = await response.json();
+        window.location.href = `/take-exam?participationId=${participationId}`;
+        
+      } catch (error) {
+        console.error('Erreur démarrage examen:', error);
+        alert("Impossible de démarrer l'examen: " + error.message);
+      }
+    }
+  </script>
 </body>
 </html>

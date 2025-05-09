@@ -8,6 +8,9 @@ const createExamRoutes = require('./routes/create_exam');
 const securePageMiddleware = require('./middlewares/authMiddleware');
 const questionsRoutes = require('./routes/questionsRoutes');
 const examDetailsRoutes = require('./routes/examDetailsRoute');
+const examPassingRoutes = require('./routes/examPassingRoute');
+const examParticipationRoutes = require('./routes/examParticipationRoutes');
+
 
 
 // Middleware
@@ -21,6 +24,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/created', createExamRoutes);
 app.use('/api/examsCreate', createExamRoutes); 
 app.use('/api/questions', questionsRoutes);
+app.use('/api/exam-passing', examPassingRoutes);
+app.use('/api/exam-details', examDetailsRoutes);
+app.use('/api/exam-participation', examParticipationRoutes);
 
 
 
@@ -55,7 +61,11 @@ app.get('/exam-details', securePageMiddleware, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'exam-details.html'));
     
 });
-app.use('/api/exam-details', examDetailsRoutes);
+
+app.get('/take-exam', securePageMiddleware, (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'take-exam.html'));
+});
+
 
 // Démarrer le serveur
 const PORT = 3000;

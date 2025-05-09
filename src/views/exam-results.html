@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Résultats - EliteXam</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2c3e50;
+      --secondary: #2980b9;
+      --success: #4CAF50;
+      --danger: #f44336;
+    }
+    .correct-answer {
+      border-left: 4px solid var(--success);
+      background-color: #e8f5e9;
+    }
+    .incorrect-answer {
+      border-left: 4px solid var(--danger);
+      background-color: #ffebee;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white p-6">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold">EliteXam</h1>
+      <nav class="flex items-center space-x-6">
+        <a href="/created" class="hover:text-gray-200">Mes examens</a>
+        <a href="/exams" class="hover:text-gray-200">Passer un examen</a>
+        <button id="logoutBtn" class="hover:text-gray-200">Déconnexion</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-xl shadow-md p-6 max-w-4xl mx-auto">
+      <div id="loading" class="text-center py-12">
+        <i class="fas fa-spinner fa-spin text-4xl text-[var(--secondary)]"></i>
+        <p class="mt-4 text-gray-600">Chargement des résultats...</p>
+      </div>
+
+      <div id="resultsContent" class="hidden">
+        <h2 class="text-2xl font-bold mb-2">Résultats de l'examen</h2>
+        <h3 id="examTitle" class="text-xl text-[var(--secondary)] mb-6"></h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div class="bg-gray-100 p-4 rounded-lg">
+            <p class="text-sm text-gray-500">Score</p>
+            <p id="totalScore" class="text-3xl font-bold"></p>
+          </div>
+          <div class="bg-gray-100 p-4 rounded-lg">
+            <p class="text-sm text-gray-500">Temps passé</p>
+            <p id="timeSpent" class="text-3xl font-bold"></p>
+          </div>
+          <div class="bg-gray-100 p-4 rounded-lg">
+            <p class="text-sm text-gray-500">Date</p>
+            <p id="completionDate" class="text-xl font-bold"></p>
+          </div>
+        </div>
+
+        <h3 class="text-lg font-semibold mb-4">Détail des questions</h3>
+        <div id="questionsResults" class="space-y-6">
+          <!-- Les résultats seront ajoutés ici -->
+        </div>
+
+        <div class="mt-8 flex justify-center">
+          <a href="/exams" class="bg-[var(--primary)] hover:bg-[var(--secondary)] text-white py-2 px-6 rounded-lg transition-colors">
+            Retour aux examens
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-[#34495e] text-white py-12 mt-12">
+    <div class="container mx-auto px-4">
+      <!-- ... (même footer que précédemment) ... -->
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkAuth();
+      await loadResults();
+      
+      // Gestion de la déconnexion
+      document.getElementById('logoutBtn').addEventListener('click', async () => {
+        try {
+          await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+          window.location.href = '/auth';
+        } catch (error) {
+          console.error('Erreur déconnexion:', error);
+        }
+      });
+    });
+
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/auth/profile', { credentials: 'include' });
+        if (!response.ok) window.location.href = '/auth';
+      } catch (error) {
+        window.location.href = '/auth';
+      }
+    }
+
+    async function loadResults() {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const participationId = urlParams.get('participationId');
+        if (!participationId) throw new Error('ID de participation manquant');
+
+        const response = await fetch(`/api/exam-passing/results/${participationId}`, {
+          credentials: 'include'
+        });
+        
+        if (!response.ok) throw new Error('Erreur chargement résultats');
+        
+        const { participation, answers } = await response.json();
+        
+        // Afficher les informations principales
+        document.getElementById('examTitle').textContent = participation.exam_title || 'Examen';
+        document.getElementById('totalScore').textContent = `${participation.total_score} points`;
+        document.getElementById('timeSpent').textContent = formatTime(participation.total_time);
+        document.getElementById('completionDate').textContent = 
+          new Date(participation.finished_at).toLocaleString();
+        
+        // Afficher les détails des questions
+        const container = document.getElementById('questionsResults');
+        container.innerHTML = answers.map(answer => {
+          const isCorrect = answer.is_correct ? 'correct' : 'incorrect';
+          const icon = answer.is_correct ? 'fa-check-circle text-[var(--success)]' : 'fa-times-circle text-[var(--danger)]';
+          
+          return `
+            <div class="p-4 border rounded-lg ${isCorrect}-answer">
+              <div class="flex justify-between items-start mb-2">
+                <h4 class="font-medium">${answer.question_text}</h4>
+                <span class="text-sm font-bold">${answer.score} point(s)</span>
+              </div>
+              
+              <div class="mb-2">
+                <p class="text-sm text-gray-600">Votre réponse:</p>
+                <p class="font-medium">${formatAnswer(answer.answer, answer.question_type)}</p>
+              </div>
+              
+              ${!answer.is_correct ? `
+                <div class="mt-2">
+                  <p class="text-sm text-gray-600">Réponse correcte:</p>
+                  <p class="font-medium">${answer.correct_answer}</p>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+        
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('resultsContent').classList.remove('hidden');
+        
+      } catch (error) {
+        console.error('Erreur:', error);
+        alert("Erreur lors du chargement des résultats: " + error.message);
+        window.location.href = '/exams';
+      }
+    }
+
+    function formatTime(seconds) {
+      if (!seconds) return '0s';
+      const hrs = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      
+      return [
+        hrs > 0 ? `${hrs}h` : '',
+        mins > 0 ? `${mins}m` : '',
+        `${secs}s`
+      ].filter(Boolean).join(' ');
+    }
+
+    function formatAnswer(answer, questionType) {
+      if (questionType === 'qcm') {
+        try {
+          const options = JSON.parse(answer);
+          return Array.isArray(options) ? options.join(', ') : answer;
+        } catch {
+          return answer;
+        }
+      }
+      return answer || 'Aucune réponse';
+    }
+  </script>
+</body>
+</html>
