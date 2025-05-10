@@ -10,6 +10,8 @@ const questionsRoutes = require('./routes/questionsRoutes');
 const examDetailsRoutes = require('./routes/examDetailsRoute');
 const examPassingRoutes = require('./routes/examPassingRoute');
 const examParticipationRoutes = require('./routes/examParticipationRoutes');
+const participationRoutes = require('./routes/participationRoutes');
+const axios = require('axios');
 
 
 
@@ -28,6 +30,7 @@ app.use('/api/exam-passing', examPassingRoutes);
 app.use('/api/exam-details', examDetailsRoutes);
 app.use('/api/exam-participation', examParticipationRoutes);
 app.use('/api/exams', createExamRoutes);
+app.use('/api/participations', participationRoutes);
 
 
 
@@ -65,6 +68,45 @@ app.get('/exam-details', securePageMiddleware, (req, res) => {
 
 app.get('/take-exam', securePageMiddleware, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'take-exam.html'));
+});
+
+app.get('/participations', securePageMiddleware, (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'exam_resultats.html'));
+});
+
+app.get('/eliteexam.png', securePageMiddleware, (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'eliteexam.png'));
+});
+
+
+app.get('/api/reverse-geocode', async (req, res) => {
+    const { lat, lng } = req.query;
+    
+    if (!lat || !lng) {
+        return res.status(400).json({ error: 'Latitude et longitude requises' });
+    }
+
+    try {
+        const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+            params: {
+                latlng: `${lat},${lng}`,
+                key: 'VOTRE_CLE_API_GOOGLE_MAPS',
+                language: 'fr' // Pour obtenir les résultats en français
+            }
+        });
+
+        if (response.data.status === 'OK') {
+            res.json({
+                address: response.data.results[0].formatted_address,
+                details: response.data.results[0]
+            });
+        } else {
+            res.status(404).json({ error: 'Adresse non trouvée' });
+        }
+    } catch (error) {
+        console.error('Erreur de géocodage:', error);
+        res.status(500).json({ error: 'Erreur lors du géocodage' });
+    }
 });
 
 
