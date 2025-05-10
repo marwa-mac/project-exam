@@ -22,7 +22,7 @@ const getAllExams = async (req, res) => {
   }
 };
 
-// Dans controllers/create_exam.js
+
 const createExam = async (req, res) => {
   try {
     const { title, description, target_audience, semestre, created_by } = req.body;

@@ -107,26 +107,25 @@ const questionsController = {
     }
   },
 
-  // questionsController.js
+
 updateQuestion: async (req, res) => {
   try {
     const { id } = req.params;
     const { content, media_url, media_type, tolerance_rate, duration, score, answer_text, options } = req.body;
 
-    // Verify the question exists
+
     const question = await Question.findById(id);
     if (!question) {
       return res.status(404).json({ error: 'Question non trouvée' });
     }
 
-    // Validate required fields
+
     if (!content || !duration || !score) {
       return res.status(400).json({ 
         error: 'Les champs content, duration et score sont obligatoires' 
       });
     }
 
-    // Update question fields
     await Question.update(id, {
       content,
       media_url: media_url || null,
@@ -136,7 +135,7 @@ updateQuestion: async (req, res) => {
       score
     });
 
-    // Handle answers based on question type
+
     if (question.question_type === 'direct') {
       if (!answer_text) {
         return res.status(400).json({ 
@@ -144,7 +143,6 @@ updateQuestion: async (req, res) => {
         });
       }
       
-      // Delete old answers and create new one
       await QuestionOption.deleteDirectAnswer(id);
       await QuestionOption.create(id, answer_text);
     } 
@@ -162,7 +160,6 @@ updateQuestion: async (req, res) => {
         });
       }
 
-      // Delete old options and create new ones
       await QuestionOption.deleteQCMOptions(id);
       for (const option of options) {
         await QuestionOption.createOptions(

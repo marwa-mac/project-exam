@@ -7,7 +7,7 @@ exports.getExamData = async (req, res) => {
     const { participationId } = req.params;
     const userId = req.userId;
 
-    // 1. Vérifier la participation
+    
     const [participation] = await pool.query(
       `SELECT ep.*, e.title as exam_title 
        FROM exam_participations ep
@@ -20,10 +20,10 @@ exports.getExamData = async (req, res) => {
       return res.status(404).json({ error: 'Participation non trouvée' });
     }
 
-    // 2. Récupérer les questions
+    
     const questions = await Question.findByExamId(participation[0].exam_id);
 
-    // 3. Ajouter les réponses possibles
+    
     const questionsWithAnswers = await Promise.all(
       questions.map(async (question) => {
         let answers;

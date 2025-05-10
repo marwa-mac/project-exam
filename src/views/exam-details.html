@@ -38,7 +38,6 @@
       padding: 0 1rem;
     }
 
-    /* Styles spécifiques à la page de détails */
     .exam-details-container {
       max-width: 1000px;
       margin: 0 auto;
@@ -163,7 +162,6 @@
       background-color: var(--primary);
     }
 
-    /* Footer styles */
     footer {
       background-color: #34495e;
       color: white;
@@ -274,7 +272,6 @@
     </div>
 
     <div id="questions-container">
-      <!-- Les questions seront ajoutées ici dynamiquement -->
     </div>
   </main>
 
@@ -319,11 +316,9 @@
   </footer>
 
   <script>
-    // Récupérer l'ID de l'examen depuis l'URL
     const urlParams = new URLSearchParams(window.location.search);
     const examId = urlParams.get('exam_id');
 
-    // Fonction pour charger les détails de l'examen
     async function loadExamDetails() {
       try {
         const response = await fetch(`/api/exam-details/${examId}`);
@@ -332,20 +327,17 @@
         }
         const exam = await response.json();
 
-        // Afficher les informations de l'examen
         document.getElementById('exam-title').textContent = exam.title;
         document.getElementById('target-audience').textContent = exam.targetAudience;
         document.getElementById('semestre').textContent = exam.semestre;
         document.getElementById('access-link').value = `${window.location.origin}/exam?access=${exam.access_link}`;
 
-        // Calculer et afficher la durée totale
         const totalDuration = exam.questions.reduce((sum, q) => sum + (q.duration || 0), 0);
         const durationMinutes = Math.ceil(totalDuration / 60);
         const totalNote = exam.questions.reduce((sum, q) => sum + (q.score || 0), 0);
         document.getElementById('total-duration').textContent = `${durationMinutes} min`;
         document.getElementById('total-note').textContent = `${totalNote} point${totalNote > 1 ? 's' : ''}`;
 
-        // Afficher les questions
         const questionsContainer = document.getElementById('questions-container');
         questionsContainer.innerHTML = '';
 
@@ -390,7 +382,6 @@
       }
     }
 
-    // Fonction pour copier le lien d'accès
     function copyAccessLink() {
       const copyText = document.getElementById('access-link');
       copyText.select();
@@ -399,12 +390,10 @@
       alert('Lien copié dans le presse-papier');
     }
 
-    // Fonction pour modifier les questions
     function editQuestions() {
       window.location.href = `/add-questions?exam_id=${examId}`;
     }
 
-    // Gestion de la déconnexion
     document.getElementById('logoutBtn').addEventListener('click', async () => {
       try {
         await fetch('/api/auth/logout', {
@@ -418,7 +407,6 @@
       }
     });
 
-    // Charger les détails au chargement de la page
     document.addEventListener('DOMContentLoaded', loadExamDetails);
   </script>
 </body>

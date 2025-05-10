@@ -30,7 +30,6 @@ class Question {
     return rows[0];
   }
 
-  // questionsModel.js
   static async update(id, { content, media_url, media_type, tolerance_rate, duration, score }) {
     const query = `
       UPDATE questions 
@@ -78,7 +77,6 @@ class Question {
       db.query(query, [examId], (err, results) => {
         if (err) return reject(err);
         
-        // Formater les résultats pour les questions QCM
         const formatted = results.map(question => {
           if (question.question_type === 'qcm') {
             const optionIds = question.option_ids ? question.option_ids.split(',') : [];

@@ -25,7 +25,6 @@
             background-color: #ffebee;
         }
 
-        /* Styles du header et footer */
         header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: #fff;
@@ -98,7 +97,6 @@
         <div class="bg-white rounded-xl shadow-md p-6 max-w-4xl mx-auto">
             <h1 class="text-2xl font-bold mb-6">Résultats de l'examen</h1>
             
-            <!-- Informations générales -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-gray-100 p-4 rounded-lg">
                     <p class="text-sm text-gray-500">Examen</p>
@@ -114,15 +112,13 @@
                 </div>
             </div>
 
-            <!-- Détails des réponses -->
+
             <h2 class="text-xl font-semibold mb-4">Détail des réponses</h2>
             <div id="answers-container" class="space-y-4">
-                <!-- Les résultats seront ajoutés ici dynamiquement -->
             </div>
         </div>
     </main>
 
-    <!-- Footer identique à la page 1 -->
     <footer>
         <div class="footer-content">
             <div class="footer-grid">
@@ -167,13 +163,13 @@
 
     <script>
 
-        // Fonction pour formater la date
+     
         function formatDate(dateString) {
             const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
             return new Date(dateString).toLocaleDateString('fr-FR', options);
         }
 
-        // Fonction pour parser les réponses (qui sont en JSON stringifié)
+
         function parseAnswer(answer) {
             try {
                 const parsed = JSON.parse(answer);
@@ -183,14 +179,14 @@
             }
         }
 
-        // Afficher les données
+        
         document.addEventListener('DOMContentLoaded', () => {
-            // Remplir les informations générales
+          
             document.getElementById('exam-name').textContent = resultData.participation.exam_name;
             document.getElementById('total-score').textContent = `${resultData.participation.total_score} points`;
             document.getElementById('completion-date').textContent = formatDate(resultData.participation.finished_at);
 
-            // Afficher chaque réponse
+          
             const answersContainer = document.getElementById('answers-container');
             
             resultData.answers.forEach(answer => {
@@ -215,7 +211,7 @@
                 answersContainer.appendChild(answerElement);
             });
 
-            // Gestion de la déconnexion
+       
             document.getElementById('logoutBtn').addEventListener('click', async () => {
                 try {
                     await fetch('/api/auth/logout', { 

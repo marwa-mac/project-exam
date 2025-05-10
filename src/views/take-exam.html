@@ -29,13 +29,13 @@
       overflow: hidden;
     }
     .answer-option input[type="checkbox"] {
-    pointer-events: auto; /* S'assurer que les events ne sont pas bloqués */
-    opacity: 1; /* S'assurer que la checkbox est visible */
+    pointer-events: auto; 
+    opacity: 1; 
 }
   </style>
 </head>
 <body class="bg-gray-100">
-  <!-- Header -->
+  
   <header class="bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white p-6">
     <div class="container mx-auto flex justify-between items-center">
       <h1 class="text-2xl font-bold">EliteXam</h1>
@@ -48,15 +48,14 @@
 
   <main class="container mx-auto px-4 py-8">
     <div id="examContainer" class="bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto">
-      <!-- État de chargement -->
+     
       <div id="loading" class="text-center py-12">
         <i class="fas fa-spinner fa-spin text-4xl text-[var(--secondary)]"></i>
         <p class="mt-4 text-gray-600">Chargement de l'examen...</p>
       </div>
 
-      <!-- Contenu de l'examen (caché initialement) -->
+     
       <div id="examContent" class="hidden">
-        <!-- Progression -->
         <div class="mb-6">
           <div class="flex justify-between mb-1">
             <span id="progressText" class="text-sm font-medium">Question 1/10</span>
@@ -67,23 +66,23 @@
           </div>
         </div>
 
-        <!-- Question -->
+       
         <div id="questionContainer" class="question-container mb-8">
           <h2 id="questionText" class="text-xl font-semibold mb-4"></h2>
           
-          <!-- Options QCM -->
+         
           <div id="qcmOptions" class="space-y-3 hidden">
-            <!-- Rempli dynamiquement -->
+           
           </div>
           
-          <!-- Réponse directe -->
+        
           <div id="directAnswerContainer" class="hidden">
             <textarea id="directAnswer" rows="3" 
               class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[var(--secondary)] focus:outline-none"></textarea>
           </div>
         </div>
 
-        <!-- Navigation -->
+        
         <div class="flex justify-between">
           <button id="prevBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded-lg transition-colors hidden">
             <i class="fas fa-arrow-left mr-2"></i> Précédent
@@ -94,7 +93,7 @@
         </div>
       </div>
 
-      <!-- État d'erreur (caché initialement) -->
+      
       <div id="errorState" class="hidden text-center py-12">
         <i class="fas fa-exclamation-triangle text-4xl text-[var(--danger)] mb-4"></i>
         <h3 class="text-xl font-bold text-[var(--danger)] mb-2">Erreur de chargement</h3>
@@ -107,7 +106,7 @@
     </div>
   </main>
 
-  <!-- Footer -->
+
   <footer class="bg-[#34495e] text-white py-12 mt-12">
     <div class="container mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
@@ -144,7 +143,7 @@
   </footer>
 
   <script>
-    // Variables globales
+   
     let examData = {};
     let currentQuestionIndex = 0;
     let userAnswers = {};
@@ -153,7 +152,7 @@
     let totalTime = 0;
     let participationId;
 
-    // Initialisation
+   
     document.addEventListener('DOMContentLoaded', async () => {
       try {
         await checkAuth();
@@ -164,7 +163,7 @@
       }
     });
 
-    // Vérification de l'authentification
+    
     async function checkAuth() {
       try {
         const response = await fetch('/api/auth/profile', { 
@@ -178,10 +177,10 @@
       }
     }
 
-    // Chargement de l'examen
+ 
     async function loadExam() {
       try {
-        // Récupérer l'ID de participation depuis l'URL
+      
         const urlParams = new URLSearchParams(window.location.search);
         participationId = urlParams.get('participationId');
         
@@ -189,50 +188,50 @@
           throw new Error('ID de participation manquant dans l\'URL');
         }
 
-        // Charger les données de l'examen
+       
         const response = await fetch(`/api/exam-participation/${participationId}`, {
           credentials: 'include'
         });
 
-        // Gérer les erreurs HTTP
+       
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
           throw new Error(errorData.message || 'Erreur lors du chargement de l\'examen');
         }
 
-        // Traiter les données reçues
+       
         const data = await response.json();
         
-        // Validation des données
+       
         if (!data.questions || !data.examTitle) {
           throw new Error('Données de l\'examen incomplètes');
         }
 
-        // Stocker les données
+       
         examData = {
           ...data,
           questions: data.questions.map(q => ({
             ...q,
-            duration: q.duration || 60 // Valeur par défaut si non spécifiée
+            duration: q.duration || 60 
           }))
         };
 
-        // Initialiser les réponses utilisateur
+     
         examData.questions.forEach(q => {
           userAnswers[q.id] = q.question_type === 'qcm' ? [] : '';
         });
 
-        // Mettre à jour l'interface
+       
         document.getElementById('examTitle').textContent = examData.examTitle;
         
-        // Cacher le loader et afficher le contenu
+     
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('examContent').classList.remove('hidden');
         
-        // Démarrer les timers
+      
         startTimers();
         
-        // Afficher la première question
+       
         showQuestion(0);
 
       } catch (error) {
@@ -241,9 +240,9 @@
       }
     }
 
-    // Gestion des timers
+  
     function startTimers() {
-      // Timer global
+     
       let seconds = 0;
       examTimer = setInterval(() => {
         seconds++;
@@ -251,7 +250,7 @@
         updateTimerDisplay(seconds, 'timer');
       }, 1000);
 
-      // Timer pour la question actuelle
+    
       resetQuestionTimer();
     }
 
@@ -268,7 +267,7 @@
         
         if (remaining <= 0) {
           clearInterval(questionTimer);
-          document.getElementById('nextBtn').click(); // Passer à la question suivante
+          document.getElementById('nextBtn').click(); 
         } else {
           updateTimerDisplay(remaining, 'questionTimer', 'Temps restant: ');
         }
@@ -284,35 +283,35 @@
         prefix + `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 
-    // Affichage des questions
+   
     function showQuestion(index) {
       if (index < 0 || index >= examData.questions.length) return;
       
       currentQuestionIndex = index;
       const question = examData.questions[index];
       
-      // Mettre à jour la progression
+     
       document.getElementById('progressText').textContent = 
         `Question ${index + 1}/${examData.questions.length}`;
       document.getElementById('progressBar').style.width = 
         `${((index + 1) / examData.questions.length) * 100}%`;
       
-      // Afficher la question
+    
       document.getElementById('questionText').textContent = question.content;
       
-      // Afficher les réponses selon le type de question
+    
       if (question.question_type === 'qcm') {
         showQCMOptions(question);
       } else {
         showDirectAnswer(question);
       }
       
-      // Gérer les boutons de navigation
+      
       document.getElementById('prevBtn').classList.toggle('hidden', index === 0);
       document.getElementById('nextBtn').textContent = 
         index === examData.questions.length - 1 ? 'Terminer' : 'Suivant';
       
-      // Redémarrer le timer pour cette question
+     
       resetQuestionTimer();
     }
 
@@ -346,7 +345,7 @@
       document.getElementById('directAnswer').value = userAnswers[question.id] || '';
     }
 
-    // Gestion des réponses
+
     function saveCurrentAnswer() {
       const question = examData.questions[currentQuestionIndex];
       
@@ -361,13 +360,13 @@
       }
     }
 
-    // Soumission de l'examen
+   
     async function submitExam() {
       try {
-        // Sauvegarder la dernière réponse
+       
         saveCurrentAnswer();
         
-        // Préparer les données de soumission
+       
         const submission = {
           answers: Object.entries(userAnswers).map(([questionId, answer]) => ({
             questionId: parseInt(questionId),
@@ -376,7 +375,7 @@
           totalTime: totalTime
         };
 
-        // Envoyer les réponses
+      
         const response = await fetch(`api/exam-passing/submit/${participationId}`, {
           method: 'POST',
           headers: {
@@ -391,7 +390,7 @@
           throw new Error(errorData.message || 'Erreur lors de la soumission');
         }
 
-        // Rediriger vers la page de résultats
+    
         window.location.href = `/exam-results?participationId=${participationId}`;
 
       } catch (error) {
@@ -400,20 +399,20 @@
       }
     }
 
-    // Gestion des erreurs
+   
     function showError(message) {
-      // Cacher tout le contenu
+     
       document.getElementById('loading').classList.add('hidden');
       document.getElementById('examContent').classList.add('hidden');
       
-      // Afficher le message d'erreur
+    
       document.getElementById('errorMessage').textContent = message;
       document.getElementById('errorState').classList.remove('hidden');
     }
 
-    // Configuration des événements
+   
     function setupEventListeners() {
-  // Navigation
+  
   document.getElementById('prevBtn').addEventListener('click', () => {
     saveCurrentAnswer();
     showQuestion(currentQuestionIndex - 1);
@@ -426,24 +425,21 @@
       : submitExam();
   });
   
-  // Modification ici - Gestion simplifiée du clic sur les options
+ 
   document.getElementById('qcmOptions').addEventListener('click', (e) => {
-    // Si on clique directement sur l'input, on ne fait rien (le navigateur gère déjà le changement)
+   
     if (e.target.tagName === 'INPUT') return;
     
-    // Si on clique sur le label ou le conteneur, on trouve l'input associé
     const optionDiv = e.target.closest('.answer-option');
     if (optionDiv) {
       const input = optionDiv.querySelector('input');
       input.checked = !input.checked;
       
-      // Feedback visuel
       optionDiv.classList.toggle('bg-blue-50', input.checked);
     }
   });
 }
 
-    // Sécurité - Nettoyage des timers
     window.addEventListener('beforeunload', () => {
       clearInterval(examTimer);
       clearInterval(questionTimer);

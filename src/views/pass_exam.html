@@ -91,7 +91,7 @@
     </div>
 
     <div id="examList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Les examens seront chargés ici -->
+     
     </div>
   </main>
 
@@ -150,7 +150,7 @@
       await checkAuth();
       loadExams();
       
-      // Gestion de la déconnexion
+    
       document.getElementById('logoutBtn').addEventListener('click', async () => {
         try {
           await fetch('/api/auth/logout', { 
@@ -219,14 +219,14 @@
 
     async function startExam(examId) {
       try {
-        // Obtenir la localisation
+       
         const position = await new Promise((resolve, reject) => {
           navigator.geolocation.getCurrentPosition(resolve, reject);
         });
         
         const { latitude, longitude } = position.coords;
         
-        // Démarrer l'examen
+        
         const response = await fetch(`/api/exam-passing/start/${examId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
