@@ -377,7 +377,7 @@
         };
 
         // Envoyer les réponses
-        const response = await fetch(`/api/exam-participation/${participationId}/submit`, {
+        const response = await fetch(`api/exam-passing/submit/${participationId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

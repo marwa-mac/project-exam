@@ -34,6 +34,7 @@ app.use('/api/participations', participationRoutes);
 
 
 
+
 // Pages non sécurisées
 app.get('/auth', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', '../public/index.html'));
@@ -76,6 +77,10 @@ app.get('/participations', securePageMiddleware, (req, res) => {
 
 app.get('/eliteexam.png', securePageMiddleware, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'eliteexam.png'));
+});
+
+app.get('/exam-results', securePageMiddleware, (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'exam-results.html'));
 });
 
 

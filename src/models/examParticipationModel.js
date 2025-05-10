@@ -32,13 +32,25 @@ class ExamParticipation {
   }
 
   static async saveAnswer(participationId, questionId, answer, isCorrect, score) {
-    await pool.query(
-      `INSERT INTO exam_answers 
-       (participation_id, question_id, answer, is_correct, score) 
-       VALUES (?, ?, ?, ?, ?)`,
-      [participationId, questionId, answer, isCorrect, score]
-    );
+
+    const formattedAnswer = typeof answer === 'string' ? answer : JSON.stringify(answer);
+  
+  await pool.query(
+    `INSERT INTO exam_answers 
+     (participation_id, question_id, answer, is_correct, score) 
+     VALUES (?, ?, ?, ?, ?)`,
+    [participationId, questionId, formattedAnswer, isCorrect, score]
+  );
   }
+
+  static async getUserParticipationById(participationId) {
+  const [rows] = await pool.query(
+    `SELECT * FROM exam_participations 
+     WHERE id = ?`,
+    [participationId]
+  );
+  return rows[0];
+}
 }
 
 module.exports = ExamParticipation;

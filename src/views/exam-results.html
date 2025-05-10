@@ -1,196 +1,233 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Résultats - EliteXam</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    :root {
-      --primary: #2c3e50;
-      --secondary: #2980b9;
-      --success: #4CAF50;
-      --danger: #f44336;
-    }
-    .correct-answer {
-      border-left: 4px solid var(--success);
-      background-color: #e8f5e9;
-    }
-    .incorrect-answer {
-      border-left: 4px solid var(--danger);
-      background-color: #ffebee;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résultats de l'examen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #2980b9;
+            --accent: #e74c3c;
+            --light: #f9f9f9;
+            --text: #2d3436;
+            --blue-light: #d0e6ff;
+        }
+
+        .correct-answer {
+            border-left: 4px solid #4CAF50;
+            background-color: #e8f5e9;
+        }
+        .incorrect-answer {
+            border-left: 4px solid #f44336;
+            background-color: #ffebee;
+        }
+
+        /* Styles du header et footer */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        footer {
+            background: #34495e;
+            color: white;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links a {
+            color: #bdc3c7;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #2c3e50;
+            padding-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .footer-bottom {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
-  <!-- Header -->
-  <header class="bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white p-6">
-    <div class="container mx-auto flex justify-between items-center">
-      <h1 class="text-2xl font-bold">EliteXam</h1>
-      <nav class="flex items-center space-x-6">
-        <a href="/created" class="hover:text-gray-200">Mes examens</a>
-        <a href="/exams" class="hover:text-gray-200">Passer un examen</a>
-        <button id="logoutBtn" class="hover:text-gray-200">Déconnexion</button>
-      </nav>
-    </div>
-  </header>
-
-  <main class="container mx-auto px-4 py-8">
-    <div class="bg-white rounded-xl shadow-md p-6 max-w-4xl mx-auto">
-      <div id="loading" class="text-center py-12">
-        <i class="fas fa-spinner fa-spin text-4xl text-[var(--secondary)]"></i>
-        <p class="mt-4 text-gray-600">Chargement des résultats...</p>
-      </div>
-
-      <div id="resultsContent" class="hidden">
-        <h2 class="text-2xl font-bold mb-2">Résultats de l'examen</h2>
-        <h3 id="examTitle" class="text-xl text-[var(--secondary)] mb-6"></h3>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div class="bg-gray-100 p-4 rounded-lg">
-            <p class="text-sm text-gray-500">Score</p>
-            <p id="totalScore" class="text-3xl font-bold"></p>
-          </div>
-          <div class="bg-gray-100 p-4 rounded-lg">
-            <p class="text-sm text-gray-500">Temps passé</p>
-            <p id="timeSpent" class="text-3xl font-bold"></p>
-          </div>
-          <div class="bg-gray-100 p-4 rounded-lg">
-            <p class="text-sm text-gray-500">Date</p>
-            <p id="completionDate" class="text-xl font-bold"></p>
-          </div>
+    
+    <header>
+        <img src="eliteexam.png" width="120px" alt="Logo EliteExam">
+        <div class="avatar">
+            <a href="/created" class="text-gray-300 hover:text-white transition-colors mx-2">Mes examens</a>
+            <a href="/exams" class="text-white transition-colors mx-2">Examens</a>
+            <a href="/participations" class="text-gray-300 hover:text-white transition-colors mx-2">Résultats</a>
+            <button id="logoutBtn" class="text-gray-300 hover:text-white transition-colors mx-2 bg-transparent border-none cursor-pointer">
+                Déconnexion
+            </button>
         </div>
+    </header>
 
-        <h3 class="text-lg font-semibold mb-4">Détail des questions</h3>
-        <div id="questionsResults" class="space-y-6">
-          <!-- Les résultats seront ajoutés ici -->
-        </div>
-
-        <div class="mt-8 flex justify-center">
-          <a href="/exams" class="bg-[var(--primary)] hover:bg-[var(--secondary)] text-white py-2 px-6 rounded-lg transition-colors">
-            Retour aux examens
-          </a>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- Footer -->
-  <footer class="bg-[#34495e] text-white py-12 mt-12">
-    <div class="container mx-auto px-4">
-      <!-- ... (même footer que précédemment) ... -->
-    </div>
-  </footer>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      await checkAuth();
-      await loadResults();
-      
-      // Gestion de la déconnexion
-      document.getElementById('logoutBtn').addEventListener('click', async () => {
-        try {
-          await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-          window.location.href = '/auth';
-        } catch (error) {
-          console.error('Erreur déconnexion:', error);
-        }
-      });
-    });
-
-    async function checkAuth() {
-      try {
-        const response = await fetch('/api/auth/profile', { credentials: 'include' });
-        if (!response.ok) window.location.href = '/auth';
-      } catch (error) {
-        window.location.href = '/auth';
-      }
-    }
-
-    async function loadResults() {
-      try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const participationId = urlParams.get('participationId');
-        if (!participationId) throw new Error('ID de participation manquant');
-
-        const response = await fetch(`/api/exam-passing/results/${participationId}`, {
-          credentials: 'include'
-        });
-        
-        if (!response.ok) throw new Error('Erreur chargement résultats');
-        
-        const { participation, answers } = await response.json();
-        
-        // Afficher les informations principales
-        document.getElementById('examTitle').textContent = participation.exam_title || 'Examen';
-        document.getElementById('totalScore').textContent = `${participation.total_score} points`;
-        document.getElementById('timeSpent').textContent = formatTime(participation.total_time);
-        document.getElementById('completionDate').textContent = 
-          new Date(participation.finished_at).toLocaleString();
-        
-        // Afficher les détails des questions
-        const container = document.getElementById('questionsResults');
-        container.innerHTML = answers.map(answer => {
-          const isCorrect = answer.is_correct ? 'correct' : 'incorrect';
-          const icon = answer.is_correct ? 'fa-check-circle text-[var(--success)]' : 'fa-times-circle text-[var(--danger)]';
-          
-          return `
-            <div class="p-4 border rounded-lg ${isCorrect}-answer">
-              <div class="flex justify-between items-start mb-2">
-                <h4 class="font-medium">${answer.question_text}</h4>
-                <span class="text-sm font-bold">${answer.score} point(s)</span>
-              </div>
-              
-              <div class="mb-2">
-                <p class="text-sm text-gray-600">Votre réponse:</p>
-                <p class="font-medium">${formatAnswer(answer.answer, answer.question_type)}</p>
-              </div>
-              
-              ${!answer.is_correct ? `
-                <div class="mt-2">
-                  <p class="text-sm text-gray-600">Réponse correcte:</p>
-                  <p class="font-medium">${answer.correct_answer}</p>
+    <main class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-xl shadow-md p-6 max-w-4xl mx-auto">
+            <h1 class="text-2xl font-bold mb-6">Résultats de l'examen</h1>
+            
+            <!-- Informations générales -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <p class="text-sm text-gray-500">Examen</p>
+                    <p id="exam-name" class="text-xl font-bold"></p>
                 </div>
-              ` : ''}
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <p class="text-sm text-gray-500">Score total</p>
+                    <p id="total-score" class="text-xl font-bold"></p>
+                </div>
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <p class="text-sm text-gray-500">Date de complétion</p>
+                    <p id="completion-date" class="text-xl font-bold"></p>
+                </div>
             </div>
-          `;
-        }).join('');
-        
-        document.getElementById('loading').classList.add('hidden');
-        document.getElementById('resultsContent').classList.remove('hidden');
-        
-      } catch (error) {
-        console.error('Erreur:', error);
-        alert("Erreur lors du chargement des résultats: " + error.message);
-        window.location.href = '/exams';
-      }
-    }
 
-    function formatTime(seconds) {
-      if (!seconds) return '0s';
-      const hrs = Math.floor(seconds / 3600);
-      const mins = Math.floor((seconds % 3600) / 60);
-      const secs = seconds % 60;
-      
-      return [
-        hrs > 0 ? `${hrs}h` : '',
-        mins > 0 ? `${mins}m` : '',
-        `${secs}s`
-      ].filter(Boolean).join(' ');
-    }
+            <!-- Détails des réponses -->
+            <h2 class="text-xl font-semibold mb-4">Détail des réponses</h2>
+            <div id="answers-container" class="space-y-4">
+                <!-- Les résultats seront ajoutés ici dynamiquement -->
+            </div>
+        </div>
+    </main>
 
-    function formatAnswer(answer, questionType) {
-      if (questionType === 'qcm') {
-        try {
-          const options = JSON.parse(answer);
-          return Array.isArray(options) ? options.join(', ') : answer;
-        } catch {
-          return answer;
+    <!-- Footer identique à la page 1 -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-grid">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">À propos</h3>
+                    <p class="text-gray-400">ExamManager Pro est la solution leader pour la gestion des examens en milieu éducatif.</p>
+                </div>
+                <div class="footer-links">
+                    <h3 class="text-lg font-semibold mb-4">Liens rapides</h3>
+                    <a href="#features" class="hover:text-white">Fonctionnalités</a>
+                    <a href="#demo" class="hover:text-white">Démonstration</a>
+                </div>
+                <div class="footer-links">
+                    <h3 class="text-lg font-semibold mb-4">Support</h3>
+                    <a href="#help" class="hover:text-white">Centre d'aide</a>
+                    <a href="#contact" class="hover:text-white">Contact</a>
+                    <a href="#docs" class="hover:text-white">Documentation</a>
+                </div>
+                <div class="footer-links">
+                    <h3 class="text-lg font-semibold mb-4">Légal</h3>
+                    <a href="#privacy" class="hover:text-white">Confidentialité</a>
+                    <a href="#terms" class="hover:text-white">Conditions</a>
+                    <a href="#gdpr" class="hover:text-white">RGPD</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="text-gray-400">&copy; 2024 ExamManager Pro. Tous droits réservés.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#twitter" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#linkedin" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                    <a href="#facebook" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+
+        // Fonction pour formater la date
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            return new Date(dateString).toLocaleDateString('fr-FR', options);
         }
-      }
-      return answer || 'Aucune réponse';
-    }
-  </script>
+
+        // Fonction pour parser les réponses (qui sont en JSON stringifié)
+        function parseAnswer(answer) {
+            try {
+                const parsed = JSON.parse(answer);
+                return Array.isArray(parsed) ? parsed.join(', ') : parsed;
+            } catch {
+                return answer;
+            }
+        }
+
+        // Afficher les données
+        document.addEventListener('DOMContentLoaded', () => {
+            // Remplir les informations générales
+            document.getElementById('exam-name').textContent = resultData.participation.exam_name;
+            document.getElementById('total-score').textContent = `${resultData.participation.total_score} points`;
+            document.getElementById('completion-date').textContent = formatDate(resultData.participation.finished_at);
+
+            // Afficher chaque réponse
+            const answersContainer = document.getElementById('answers-container');
+            
+            resultData.answers.forEach(answer => {
+                const answerElement = document.createElement('div');
+                answerElement.className = `p-4 border rounded-lg ${answer.is_correct ? 'correct-answer' : 'incorrect-answer'}`;
+                
+                answerElement.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-medium">Question : ${answer.question_id}</h3>
+                        <span class="text-sm font-bold">${answer.score} point(s)</span>
+                    </div>
+                    <div class="mb-2">
+                        <p class="text-sm text-gray-600">Votre réponse:</p>
+                        <p class="font-medium">${parseAnswer(answer.answer)}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Statut:</p>
+                        <p class="font-medium">${answer.is_correct ? 'Correcte' : 'Incorrecte'}</p>
+                    </div>
+                `;
+                
+                answersContainer.appendChild(answerElement);
+            });
+
+            // Gestion de la déconnexion
+            document.getElementById('logoutBtn').addEventListener('click', async () => {
+                try {
+                    await fetch('/api/auth/logout', { 
+                        method: 'POST', 
+                        credentials: 'include' 
+                    });
+                    window.location.href = '/auth';
+                } catch (error) {
+                    console.error('Erreur déconnexion:', error);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
