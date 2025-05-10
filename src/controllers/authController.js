@@ -3,9 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const authController = {
-  /**
-   * Enregistrement d'un nouvel utilisateur
-   */
+  
   async register(req, res) {
     try {
       const { 
@@ -37,7 +35,7 @@ const authController = {
       
       const hashedPassword = await bcrypt.hash(normalizedPassword, 12);
 
-      // Création de l'utilisateur avec les données contrôlées
+      
       const newUser = await User.create({
         email: normalizedEmail,
         password: hashedPassword,
@@ -49,7 +47,7 @@ const authController = {
         field_of_study: field_of_study || null
       });
 
-      // Génération du token JWT
+     
       const token = jwt.sign(
         { userId: newUser.id },
         process.env.JWT_SECRET || 'votre_secret_secure',
@@ -62,7 +60,7 @@ const authController = {
       res.cookie('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000, // 24 heures
+        maxAge: 24 * 60 * 60 * 1000, 
         sameSite: 'strict'
       });
 
@@ -87,9 +85,7 @@ const authController = {
     }
   },
 
-  /**
-   * Connexion de l'utilisateur
-   */
+  
   async login(req, res) {
     try {
       const { email, password } = req.body;
@@ -154,12 +150,10 @@ const authController = {
     }
   },
 
-  /**
-   * Déconnexion de l'utilisateur
-   */
+ 
   async logout(req, res) {
     try {
-      // Suppression du cookie
+      
       res.clearCookie('token', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -176,9 +170,7 @@ const authController = {
     }
   },
 
-  /**
-   * Récupération du profil utilisateur
-   */
+  
   async getProfile(req, res) {
     try {
       const user = await User.findById(req.userId);
@@ -195,9 +187,7 @@ const authController = {
     }
   },
 
-  /**
-   * Vérification de l'authentification
-   */
+  
   async checkAuth(req, res) {
     try {
       const token = req.cookies.token;

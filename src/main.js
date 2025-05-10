@@ -34,7 +34,7 @@ app.use('/api/participations', participationRoutes);
 
 
 
-// Pages non sécurisées
+
 app.get('/auth', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', '../public/index.html'));
 });
@@ -47,7 +47,6 @@ app.get('/inscription', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'inscription.html'));
 });
 
-// Pages sécurisées
 app.get('/exams', securePageMiddleware, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'pass_exam.html'));
 });
@@ -78,6 +77,10 @@ app.get('/eliteexam.png', securePageMiddleware, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'eliteexam.png'));
 });
 
+app.get('/exam-results', securePageMiddleware, (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'exam-results.html'));
+});
+
 
 app.get('/api/reverse-geocode', async (req, res) => {
     const { lat, lng } = req.query;
@@ -91,7 +94,7 @@ app.get('/api/reverse-geocode', async (req, res) => {
             params: {
                 latlng: `${lat},${lng}`,
                 key: 'VOTRE_CLE_API_GOOGLE_MAPS',
-                language: 'fr' // Pour obtenir les résultats en français
+                language: 'fr' 
             }
         });
 
@@ -110,7 +113,7 @@ app.get('/api/reverse-geocode', async (req, res) => {
 });
 
 
-// Démarrer le serveur
+
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

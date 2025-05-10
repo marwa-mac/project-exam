@@ -156,7 +156,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
-            // Récupérer l'ID de l'examen depuis l'URL
+           
             const urlParams = new URLSearchParams(window.location.search);
             const examId = urlParams.get('exam_id');
             
@@ -166,32 +166,32 @@
             }
 
             try {
-                // Récupérer les détails de l'examen
+             
                 const examResponse = await fetch(`/api/created/${examId}`);
                 if (!examResponse.ok) throw new Error('Erreur lors de la récupération de l\'examen');
                 const exam = await examResponse.json();
 
-                // Afficher les informations de l'examen
+                
                 document.getElementById('examTitle').textContent = exam.title;
                 document.getElementById('accessLink').textContent = window.location.origin + '/exam/' + exam.access_link;
 
-                // Récupérer les questions de l'examen
+                
                 const questionsResponse = await fetch(`/api/questions/exam/${examId}`);
                 if (!questionsResponse.ok) throw new Error('Erreur lors de la récupération des questions');
                 const questions = await questionsResponse.json();
 
-                // Calculer la durée totale
+                
                 let totalDuration = 0;
                 const questionsContainer = document.getElementById('questionsContainer');
 
-                // Afficher chaque question
+            
                 for (const question of questions) {
                     totalDuration += parseInt(question.duration) || 0;
 
                     const questionCard = document.createElement('div');
                     questionCard.className = 'question-card';
 
-                    // En-tête de la question
+                  
                     const questionHeader = document.createElement('div');
                     questionHeader.className = 'question-header';
 
@@ -207,13 +207,13 @@
                     questionHeader.appendChild(durationScore);
                     questionCard.appendChild(questionHeader);
 
-                    // Contenu de la question
+                  
                     const questionContent = document.createElement('div');
                     questionContent.className = 'question-content';
                     questionContent.textContent = question.content;
                     questionCard.appendChild(questionContent);
 
-                    // Media si présent
+                   
                     if (question.media_url) {
                         const mediaContainer = document.createElement('div');
                         mediaContainer.className = 'media-container';
@@ -233,7 +233,7 @@
                         questionCard.appendChild(mediaContainer);
                     }
 
-                    // Réponses
+                 
                     if (question.question_type === 'direct') {
                         const answerText = document.createElement('div');
                         answerText.innerHTML = `<strong>Réponse attendue:</strong> ${question.answer_text}`;
@@ -277,13 +277,13 @@
                     questionsContainer.appendChild(questionCard);
                 }
 
-                // Afficher la durée totale
+              
                 const minutes = Math.floor(totalDuration / 60);
                 const seconds = totalDuration % 60;
                 document.getElementById('totalDuration').textContent = 
                     `${minutes > 0 ? minutes + ' min ' : ''}${seconds > 0 ? seconds + 's' : ''}`.trim() || '0s';
 
-                // Gestion du bouton de modification
+               
                 document.getElementById('modifyExamBtn').addEventListener('click', function() {
                     window.location.href = `/add-questions?exam_id=${examId}`;
                 });
@@ -304,7 +304,7 @@
     }
 
     try {
-        // 1. Récupérer les détails de l'examen
+        
         const examResponse = await fetch(`/api/created/${examId}`);
         if (!examResponse.ok) {
             const errorData = await examResponse.json();
@@ -312,20 +312,17 @@
         }
         const exam = await examResponse.json();
 
-        // 2. Récupérer les questions
+      
         const questionsResponse = await fetch(`/api/questions/exam/${examId}`);
         if (!questionsResponse.ok) {
             throw new Error('Erreur lors de la récupération des questions');
         }
         const questions = await questionsResponse.json();
 
-        // ... reste du code d'affichage ...
-
     } catch (error) {
         console.error('Erreur:', error);
         alert(error.message);
-        // Optionnel: rediriger vers une page d'erreur ou la page précédente
-        // window.history.back();
+       
     }
 });
     </script>

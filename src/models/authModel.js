@@ -1,9 +1,7 @@
 const db = require('../BDD/run');
 
 class User {
-  /**
-   * Trouve un utilisateur par email
-   */
+ 
   static async findByEmail(email) {
     try {
       const [rows] = await db.query(
@@ -17,9 +15,7 @@ class User {
     }
   }
 
-  /**
-   * Crée un nouvel utilisateur
-   */
+ 
   static async create(userData) {
     try {
       const [result] = await db.query(
@@ -33,9 +29,7 @@ class User {
     }
   }
 
-  /**
-   * Trouve un utilisateur par ID
-   */
+  
   static async findById(id) {
     try {
       const [rows] = await db.query(

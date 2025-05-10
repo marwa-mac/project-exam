@@ -12,7 +12,6 @@
       --secondary: #2980b9;
       --success: #4CAF50;
       --danger: #f44336;
-      --warning: #ff9800;
     }
     .timer {
       font-family: monospace;
@@ -30,19 +29,13 @@
       overflow: hidden;
     }
     .answer-option input[type="checkbox"] {
-      pointer-events: auto;
-      opacity: 1;
-    }
-    .admin-tools {
-      transition: all 0.3s ease;
-    }
-    .edit-modal {
-      transition: opacity 0.2s ease, transform 0.2s ease;
-    }
+    pointer-events: auto; 
+    opacity: 1; 
+}
   </style>
 </head>
 <body class="bg-gray-100">
-  <!-- Header -->
+  
   <header class="bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white p-6">
     <div class="container mx-auto flex justify-between items-center">
       <h1 class="text-2xl font-bold">EliteXam</h1>
@@ -54,39 +47,15 @@
   </header>
 
   <main class="container mx-auto px-4 py-8">
-    <div id="examContainer" class="bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto relative">
-      <!-- Bouton d'administration (visible seulement pour l'auteur) -->
-      <div id="adminBtn" class="absolute top-4 right-4 hidden">
-        <button id="toggleAdminTools" class="bg-[var(--warning)] hover:bg-amber-600 text-white p-2 rounded-full">
-          <i class="fas fa-cog"></i>
-        </button>
-      </div>
-
-      <!-- Outils d'administration (caché initialement) -->
-      <div id="adminTools" class="admin-tools hidden mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <h3 class="font-bold text-lg mb-3 text-[var(--primary)]">Outils d'administration</h3>
-        <div class="flex space-x-3">
-          <button id="editQuestionBtn" class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded text-sm">
-            <i class="fas fa-edit mr-1"></i> Modifier
-          </button>
-          <button id="deleteQuestionBtn" class="bg-[var(--danger)] hover:bg-red-700 text-white py-1 px-3 rounded text-sm">
-            <i class="fas fa-trash mr-1"></i> Supprimer
-          </button>
-          <button id="addQuestionBtn" class="bg-[var(--success)] hover:bg-green-600 text-white py-1 px-3 rounded text-sm">
-            <i class="fas fa-plus mr-1"></i> Ajouter
-          </button>
-        </div>
-      </div>
-
-      <!-- État de chargement -->
+    <div id="examContainer" class="bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto">
+     
       <div id="loading" class="text-center py-12">
         <i class="fas fa-spinner fa-spin text-4xl text-[var(--secondary)]"></i>
         <p class="mt-4 text-gray-600">Chargement de l'examen...</p>
       </div>
 
-      <!-- Contenu de l'examen (caché initialement) -->
+     
       <div id="examContent" class="hidden">
-        <!-- Progression -->
         <div class="mb-6">
           <div class="flex justify-between mb-1">
             <span id="progressText" class="text-sm font-medium">Question 1/10</span>
@@ -97,23 +66,23 @@
           </div>
         </div>
 
-        <!-- Question -->
+       
         <div id="questionContainer" class="question-container mb-8">
           <h2 id="questionText" class="text-xl font-semibold mb-4"></h2>
           
-          <!-- Options QCM -->
+         
           <div id="qcmOptions" class="space-y-3 hidden">
-            <!-- Rempli dynamiquement -->
+           
           </div>
           
-          <!-- Réponse directe -->
+        
           <div id="directAnswerContainer" class="hidden">
             <textarea id="directAnswer" rows="3" 
               class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[var(--secondary)] focus:outline-none"></textarea>
           </div>
         </div>
 
-        <!-- Navigation -->
+        
         <div class="flex justify-between">
           <button id="prevBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded-lg transition-colors hidden">
             <i class="fas fa-arrow-left mr-2"></i> Précédent
@@ -124,7 +93,7 @@
         </div>
       </div>
 
-      <!-- État d'erreur (caché initialement) -->
+      
       <div id="errorState" class="hidden text-center py-12">
         <i class="fas fa-exclamation-triangle text-4xl text-[var(--danger)] mb-4"></i>
         <h3 class="text-xl font-bold text-[var(--danger)] mb-2">Erreur de chargement</h3>
@@ -137,49 +106,7 @@
     </div>
   </main>
 
-  <!-- Modal de modification -->
-  <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-md edit-modal opacity-0 transform scale-95">
-      <div class="p-6">
-        <h3 class="text-xl font-bold mb-4 text-[var(--primary)]">Modifier la question</h3>
-        
-        <form id="editQuestionForm">
-          <input type="hidden" id="editQuestionId">
-          
-          <div class="mb-4">
-            <label for="editQuestionContent" class="block text-sm font-medium text-gray-700 mb-1">Question</label>
-            <textarea id="editQuestionContent" rows="3" class="w-full p-2 border rounded focus:ring-2 focus:ring-[var(--secondary)]"></textarea>
-          </div>
-          
-          <div id="editDirectAnswerContainer" class="mb-4 hidden">
-            <label for="editDirectAnswer" class="block text-sm font-medium text-gray-700 mb-1">Réponse correcte</label>
-            <input type="text" id="editDirectAnswer" class="w-full p-2 border rounded">
-          </div>
-          
-          <div id="editQcmOptionsContainer" class="mb-4 hidden">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Options QCM</label>
-            <div id="editQcmOptionsList" class="space-y-2">
-              <!-- Options seront ajoutées dynamiquement -->
-            </div>
-            <button type="button" id="addQcmOptionBtn" class="mt-2 text-sm text-[var(--secondary)] hover:underline">
-              <i class="fas fa-plus mr-1"></i> Ajouter une option
-            </button>
-          </div>
-          
-          <div class="flex justify-end space-x-3 pt-4">
-            <button type="button" id="cancelEditBtn" class="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-100">
-              Annuler
-            </button>
-            <button type="submit" class="px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--secondary)]">
-              Enregistrer
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
 
-  <!-- Footer -->
   <footer class="bg-[#34495e] text-white py-12 mt-12">
     <div class="container mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
@@ -216,7 +143,7 @@
   </footer>
 
   <script>
-    // Variables globales
+   
     let examData = {};
     let currentQuestionIndex = 0;
     let userAnswers = {};
@@ -224,9 +151,8 @@
     let questionTimer;
     let totalTime = 0;
     let participationId;
-    let isAuthor = false;
 
-    // Initialisation
+   
     document.addEventListener('DOMContentLoaded', async () => {
       try {
         await checkAuth();
@@ -237,7 +163,7 @@
       }
     });
 
-    // Vérification de l'authentification
+    
     async function checkAuth() {
       try {
         const response = await fetch('/api/auth/profile', { 
@@ -251,9 +177,10 @@
       }
     }
 
-    // Chargement de l'examen
+ 
     async function loadExam() {
       try {
+      
         const urlParams = new URLSearchParams(window.location.search);
         participationId = urlParams.get('participationId');
         
@@ -261,44 +188,50 @@
           throw new Error('ID de participation manquant dans l\'URL');
         }
 
+       
         const response = await fetch(`/api/exam-participation/${participationId}`, {
           credentials: 'include'
         });
 
+       
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
           throw new Error(errorData.message || 'Erreur lors du chargement de l\'examen');
         }
 
+       
         const data = await response.json();
         
+       
         if (!data.questions || !data.examTitle) {
           throw new Error('Données de l\'examen incomplètes');
         }
 
-        // Stocker si l'utilisateur est l'auteur
-        isAuthor = data.isAuthor || false;
-        if (isAuthor) {
-          document.getElementById('adminBtn').classList.remove('hidden');
-        }
-
+       
         examData = {
           ...data,
           questions: data.questions.map(q => ({
             ...q,
-            duration: q.duration || 60
+            duration: q.duration || 60 
           }))
         };
 
+     
         examData.questions.forEach(q => {
           userAnswers[q.id] = q.question_type === 'qcm' ? [] : '';
         });
 
+       
         document.getElementById('examTitle').textContent = examData.examTitle;
+        
+     
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('examContent').classList.remove('hidden');
         
+      
         startTimers();
+        
+       
         showQuestion(0);
 
       } catch (error) {
@@ -307,8 +240,9 @@
       }
     }
 
-    // Gestion des timers
+  
     function startTimers() {
+     
       let seconds = 0;
       examTimer = setInterval(() => {
         seconds++;
@@ -316,6 +250,7 @@
         updateTimerDisplay(seconds, 'timer');
       }, 1000);
 
+    
       resetQuestionTimer();
     }
 
@@ -332,7 +267,7 @@
         
         if (remaining <= 0) {
           clearInterval(questionTimer);
-          document.getElementById('nextBtn').click();
+          document.getElementById('nextBtn').click(); 
         } else {
           updateTimerDisplay(remaining, 'questionTimer', 'Temps restant: ');
         }
@@ -348,56 +283,61 @@
         prefix + `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 
-    // Affichage des questions
+   
     function showQuestion(index) {
       if (index < 0 || index >= examData.questions.length) return;
       
       currentQuestionIndex = index;
       const question = examData.questions[index];
       
+     
       document.getElementById('progressText').textContent = 
         `Question ${index + 1}/${examData.questions.length}`;
       document.getElementById('progressBar').style.width = 
         `${((index + 1) / examData.questions.length) * 100}%`;
       
+    
       document.getElementById('questionText').textContent = question.content;
       
+    
       if (question.question_type === 'qcm') {
         showQCMOptions(question);
       } else {
         showDirectAnswer(question);
       }
       
+      
       document.getElementById('prevBtn').classList.toggle('hidden', index === 0);
       document.getElementById('nextBtn').textContent = 
         index === examData.questions.length - 1 ? 'Terminer' : 'Suivant';
       
+     
       resetQuestionTimer();
     }
 
     function showQCMOptions(question) {
-      const optionsContainer = document.getElementById('qcmOptions');
-      optionsContainer.innerHTML = '';
-      optionsContainer.classList.remove('hidden');
-      document.getElementById('directAnswerContainer').classList.add('hidden');
-      
-      question.answers.forEach((opt, i) => {
-        const optionElement = document.createElement('div');
-        optionElement.className = 'flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 answer-option';
-        optionElement.dataset.optionId = opt.id;
-        
-        optionElement.innerHTML = `
-          <input type="checkbox" 
-                 name="qcmOption" 
-                 id="opt${i}" 
-                 class="mr-3"
-                 ${userAnswers[question.id].includes(opt.id) ? 'checked' : ''}>
-          <label for="opt${i}" class="flex-1 cursor-pointer">${opt.option_text}</label>
-        `;
-        
-        optionsContainer.appendChild(optionElement);
-      });
-    }
+  const optionsContainer = document.getElementById('qcmOptions');
+  optionsContainer.innerHTML = '';
+  optionsContainer.classList.remove('hidden');
+  document.getElementById('directAnswerContainer').classList.add('hidden');
+  
+  question.answers.forEach((opt, i) => {
+    const optionElement = document.createElement('div');
+    optionElement.className = 'flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 answer-option';
+    optionElement.dataset.optionId = opt.id;
+    
+    optionElement.innerHTML = `
+      <input type="checkbox" 
+             name="qcmOption" 
+             id="opt${i}" 
+             class="mr-3"
+             ${userAnswers[question.id].includes(opt.id) ? 'checked' : ''}>
+      <label for="opt${i}" class="flex-1 cursor-pointer">${opt.option_text}</label>
+    `;
+    
+    optionsContainer.appendChild(optionElement);
+  });
+}
 
     function showDirectAnswer(question) {
       document.getElementById('qcmOptions').classList.add('hidden');
@@ -405,7 +345,7 @@
       document.getElementById('directAnswer').value = userAnswers[question.id] || '';
     }
 
-    // Gestion des réponses
+
     function saveCurrentAnswer() {
       const question = examData.questions[currentQuestionIndex];
       
@@ -420,11 +360,13 @@
       }
     }
 
-    // Soumission de l'examen
+   
     async function submitExam() {
       try {
+       
         saveCurrentAnswer();
         
+       
         const submission = {
           answers: Object.entries(userAnswers).map(([questionId, answer]) => ({
             questionId: parseInt(questionId),
@@ -433,7 +375,8 @@
           totalTime: totalTime
         };
 
-        const response = await fetch(`/api/exam-participation/${participationId}/submit`, {
+      
+        const response = await fetch(`api/exam-passing/submit/${participationId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -447,6 +390,7 @@
           throw new Error(errorData.message || 'Erreur lors de la soumission');
         }
 
+    
         window.location.href = `/exam-results?participationId=${participationId}`;
 
       } catch (error) {
@@ -455,222 +399,47 @@
       }
     }
 
-    // Gestion des erreurs
+   
     function showError(message) {
+     
       document.getElementById('loading').classList.add('hidden');
       document.getElementById('examContent').classList.add('hidden');
+      
+    
       document.getElementById('errorMessage').textContent = message;
       document.getElementById('errorState').classList.remove('hidden');
     }
 
-    // Fonctions pour la gestion des questions (modification/suppression)
-    async function deleteCurrentQuestion() {
-      try {
-        const question = examData.questions[currentQuestionIndex];
-        if (!confirm(`Voulez-vous vraiment supprimer cette question?`)) return;
-
-        const response = await fetch(`/api/questions/${question.id}`, {
-          method: 'DELETE',
-          credentials: 'include'
-        });
-
-        if (!response.ok) {
-          throw new Error('Erreur lors de la suppression');
-        }
-
-        // Recharger l'examen après suppression
-        await loadExam();
-        showNotification('Question supprimée avec succès', 'success');
-
-      } catch (error) {
-        console.error('Erreur:', error);
-        showNotification(error.message || 'Erreur lors de la suppression', 'error');
-      }
-    }
-
-    function openEditModal() {
-      const question = examData.questions[currentQuestionIndex];
-      const modal = document.getElementById('editModal');
-      const form = document.getElementById('editQuestionForm');
-      
-      // Remplir le formulaire
-      document.getElementById('editQuestionId').value = question.id;
-      document.getElementById('editQuestionContent').value = question.content;
-      
-      // Configurer selon le type de question
-      if (question.question_type === 'direct') {
-        document.getElementById('editDirectAnswerContainer').classList.remove('hidden');
-        document.getElementById('editQcmOptionsContainer').classList.add('hidden');
-        document.getElementById('editDirectAnswer').value = question.answers[0]?.answer_text || '';
-      } else {
-        document.getElementById('editDirectAnswerContainer').classList.add('hidden');
-        document.getElementById('editQcmOptionsContainer').classList.remove('hidden');
-        
-        const optionsList = document.getElementById('editQcmOptionsList');
-        optionsList.innerHTML = '';
-        
-        question.answers.forEach((opt, index) => {
-          const optionDiv = document.createElement('div');
-          optionDiv.className = 'flex items-center space-x-2';
-          optionDiv.innerHTML = `
-            <input type="text" value="${opt.option_text}" class="flex-1 p-1 border rounded" required>
-            <input type="checkbox" ${opt.is_correct ? 'checked' : ''} class="mr-2">
-            <button type="button" class="remove-option text-red-500 hover:text-red-700">
-              <i class="fas fa-times"></i>
-            </button>
-          `;
-          optionsList.appendChild(optionDiv);
-        });
-      }
-      
-      // Afficher le modal avec animation
-      modal.classList.remove('hidden');
-      setTimeout(() => {
-        modal.querySelector('.edit-modal').classList.remove('opacity-0', 'scale-95');
-        modal.querySelector('.edit-modal').classList.add('opacity-100', 'scale-100');
-      }, 10);
-    }
-
-    async function submitEditQuestion(e) {
-      e.preventDefault();
-      
-      try {
-        const questionId = document.getElementById('editQuestionId').value;
-        const content = document.getElementById('editQuestionContent').value;
-        const question = examData.questions[currentQuestionIndex];
-        
-        let updateData = {
-          content,
-          question_type: question.question_type
-        };
-        
-        if (question.question_type === 'direct') {
-          updateData.answer_text = document.getElementById('editDirectAnswer').value;
-        } else {
-          const options = Array.from(document.querySelectorAll('#editQcmOptionsList > div')).map(div => {
-            return {
-              option_text: div.querySelector('input[type="text"]').value,
-              is_correct: div.querySelector('input[type="checkbox"]').checked
-            };
-          });
-          
-          updateData.options = options;
-        }
-        
-        const response = await fetch(`/api/questions/${questionId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include',
-          body: JSON.stringify(updateData)
-        });
-        
-        if (!response.ok) {
-          throw new Error('Erreur lors de la mise à jour');
-        }
-        
-        closeEditModal();
-        await loadExam();
-        showNotification('Question mise à jour avec succès', 'success');
-        
-      } catch (error) {
-        console.error('Erreur:', error);
-        showNotification(error.message || 'Erreur lors de la mise à jour', 'error');
-      }
-    }
-
-    function closeEditModal() {
-      const modal = document.getElementById('editModal');
-      modal.querySelector('.edit-modal').classList.add('opacity-0', 'scale-95');
-      modal.querySelector('.edit-modal').classList.remove('opacity-100', 'scale-100');
-      
-      setTimeout(() => {
-        modal.classList.add('hidden');
-      }, 200);
-    }
-
-    function showNotification(message, type = 'info') {
-      const colors = {
-        success: 'bg-green-500',
-        error: 'bg-red-500',
-        info: 'bg-blue-500'
-      };
-      
-      const notification = document.createElement('div');
-      notification.className = `fixed top-4 right-4 text-white px-4 py-2 rounded-lg shadow-lg ${colors[type]}`;
-      notification.textContent = message;
-      
-      document.body.appendChild(notification);
-      
-      setTimeout(() => {
-        notification.classList.add('opacity-0', 'translate-y-2');
-        setTimeout(() => notification.remove(), 300);
-      }, 3000);
-    }
-
-    // Configuration des événements
+   
     function setupEventListeners() {
-      // Navigation
-      document.getElementById('prevBtn').addEventListener('click', () => {
-        saveCurrentAnswer();
-        showQuestion(currentQuestionIndex - 1);
-      });
+  
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    saveCurrentAnswer();
+    showQuestion(currentQuestionIndex - 1);
+  });
+  
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    saveCurrentAnswer();
+    currentQuestionIndex < examData.questions.length - 1
+      ? showQuestion(currentQuestionIndex + 1)
+      : submitExam();
+  });
+  
+ 
+  document.getElementById('qcmOptions').addEventListener('click', (e) => {
+   
+    if (e.target.tagName === 'INPUT') return;
+    
+    const optionDiv = e.target.closest('.answer-option');
+    if (optionDiv) {
+      const input = optionDiv.querySelector('input');
+      input.checked = !input.checked;
       
-      document.getElementById('nextBtn').addEventListener('click', () => {
-        saveCurrentAnswer();
-        currentQuestionIndex < examData.questions.length - 1
-          ? showQuestion(currentQuestionIndex + 1)
-          : submitExam();
-      });
-      
-      // Options QCM
-      document.getElementById('qcmOptions').addEventListener('click', (e) => {
-        if (e.target.tagName === 'INPUT') return;
-        const optionDiv = e.target.closest('.answer-option');
-        if (optionDiv) {
-          const input = optionDiv.querySelector('input');
-          input.checked = !input.checked;
-          optionDiv.classList.toggle('bg-blue-50', input.checked);
-        }
-      });
-      
-      // Outils d'administration
-      document.getElementById('toggleAdminTools').addEventListener('click', () => {
-        document.getElementById('adminTools').classList.toggle('hidden');
-      });
-      
-      document.getElementById('editQuestionBtn').addEventListener('click', openEditModal);
-      document.getElementById('deleteQuestionBtn').addEventListener('click', deleteCurrentQuestion);
-      
-      // Modal d'édition
-      document.getElementById('cancelEditBtn').addEventListener('click', closeEditModal);
-      document.getElementById('editQuestionForm').addEventListener('submit', submitEditQuestion);
-      
-      // Ajout d'options QCM dans le modal
-      document.getElementById('addQcmOptionBtn').addEventListener('click', () => {
-        const optionsList = document.getElementById('editQcmOptionsList');
-        const optionDiv = document.createElement('div');
-        optionDiv.className = 'flex items-center space-x-2';
-        optionDiv.innerHTML = `
-          <input type="text" class="flex-1 p-1 border rounded" required>
-          <input type="checkbox" class="mr-2">
-          <button type="button" class="remove-option text-red-500 hover:text-red-700">
-            <i class="fas fa-times"></i>
-          </button>
-        `;
-        optionsList.appendChild(optionDiv);
-      });
-      
-      // Suppression d'options dans le modal
-      document.getElementById('editQcmOptionsList').addEventListener('click', (e) => {
-        if (e.target.closest('.remove-option')) {
-          e.target.closest('div').remove();
-        }
-      });
+      optionDiv.classList.toggle('bg-blue-50', input.checked);
     }
+  });
+}
 
-    // Sécurité - Nettoyage des timers
     window.addEventListener('beforeunload', () => {
       clearInterval(examTimer);
       clearInterval(questionTimer);

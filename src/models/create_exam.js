@@ -24,7 +24,6 @@ const createExam = async (examData) => {
 };
 
 const getExamWithQuestions = async (examId) => {
-  // Récupérer les infos de base de l'examen
   const [examRows] = await pool.query(
     'SELECT id, title, target_audience AS targetAudience, semestre, access_link AS accessLink FROM exams WHERE id = ?',
     [examId]
@@ -34,7 +33,6 @@ const getExamWithQuestions = async (examId) => {
   
   const exam = examRows[0];
   
-  // Récupérer les questions de l'examen
   const [questionRows] = await pool.query(
     'SELECT id, question_type AS questionType, content, duration, score FROM questions WHERE exam_id = ?',
     [examId]
@@ -42,17 +40,14 @@ const getExamWithQuestions = async (examId) => {
   
   exam.questions = [];
   
-  // Pour chaque question, récupérer les réponses
   for (const question of questionRows) {
     if (question.questionType === 'qcm') {
-      // Récupérer les options QCM
       const [optionRows] = await pool.query(
         'SELECT id, option_text AS optionText, is_correct AS isCorrect FROM qcm_options WHERE question_id = ?',
         [question.id]
       );
       question.answers = optionRows;
     } else {
-      // Récupérer la réponse directe
       const [answerRows] = await pool.query(
         'SELECT correct_answer AS correctAnswer FROM direct_answers WHERE question_id = ?',
         [question.id]

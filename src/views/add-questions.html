@@ -134,10 +134,11 @@
 <body>
 
   <header>
-    <h1>EliteXam</h1>
+    <img src="eliteexam.png" width="120px" alt="Trulli" >
     <div class="avatar">
       <a href="/created" class="text-white transition-colors mx-2">Mes examens</a>
       <a href="/exams" class="text-gray-300 hover:text-white transition-colors mx-2">Examens</a>
+      <a href="/participations" class="text-gray-300 hover:text-white transition-colors mx-2">Results</a>
       <button id="logoutBtn" class="text-gray-300 hover:text-white transition-colors mx-2 bg-transparent border-none cursor-pointer">
         Déconnexion
        </button>
@@ -148,17 +149,12 @@
     <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-sm p-4">
       <h1 class="text-xl font-bold mb-4 text-center">Création de Questions</h1>
 
-      <!-- Section pour les questions existantes -->
       <div id="existingQuestionsContainer" class="mb-6">
-        <!-- <h2 class="text-lg font-semibold mb-2 text-gray-700">Questions existantes</h2> -->
         <div id="existingQuestionsList" class="space-y-3">
-          <!-- Les questions existantes seront chargées ici -->
         </div>
       </div>
 
-      <!-- Section pour les nouvelles questions -->
       <div id="questionsContainer" class="space-y-3">
-        <!-- Les nouvelles questions seront ajoutées ici dynamiquement -->
       </div>
 
       <div class="mt-4 flex flex-wrap gap-3 justify-center">
@@ -240,7 +236,6 @@
     let existingQuestions = [];
     let editingQuestionId = null;
 
-    // Charger les questions existantes
     async function loadExistingQuestions() {
       try {
         const response = await fetch(`/api/exams/${examId}`, {
@@ -265,7 +260,6 @@
       }
     }
 
-    // Afficher les questions existantes
     function renderExistingQuestions() {
       const container = document.getElementById('existingQuestionsList');
       container.innerHTML = '';
@@ -299,7 +293,7 @@
         } else {
           answersHtml = `
             <div class="p-1 bg-blue-50 rounded text-xs">
-              Réponse: ${question.answers.correct_answer || 'Non spécifiée'}
+              Réponse: ${question.answers.answer_text || 'Non spécifiée'}
             </div>
           `;
         }
@@ -337,7 +331,6 @@
         container.appendChild(questionDiv);
       });
 
-      // Gestion de la suppression des questions existantes
       document.querySelectorAll('.delete-existing-question').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           const questionId = e.target.closest('button').dataset.id;
@@ -349,7 +342,7 @@
               });
               
               if (response.ok) {
-                loadExistingQuestions(); // Recharger la liste
+                loadExistingQuestions(); 
               } else {
                 alert('Erreur lors de la suppression');
               }
@@ -361,7 +354,6 @@
         });
       });
 
-      // Gestion de la modification des questions existantes
       document.querySelectorAll('.edit-existing-question').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const questionId = e.target.closest('button').dataset.id;
@@ -370,7 +362,6 @@
       });
     }
 
-    // Modifier une question existante
     function editExistingQuestion(questionId) {
       const question = existingQuestions.find(q => q.id == questionId);
       if (!question) return;
@@ -378,7 +369,6 @@
       editingQuestionId = questionId;
       renderExistingQuestions();
 
-      // Créer un formulaire d'édition
       const editForm = document.createElement('div');
       editForm.className = 'border border-gray-200 p-3 rounded-md bg-white shadow-xs mt-3 text-sm';
       editForm.id = `edit-question-${questionId}`;
@@ -425,7 +415,6 @@
           </div>
         `;
       } else {
-        // QCM
         let optionsHtml = '';
         question.answers.forEach((option, index) => {
           optionsHtml += `
@@ -485,22 +474,18 @@
         `;
       }
 
-      // Ajouter le formulaire après la question
       const questionElement = document.querySelector(`.edit-existing-question[data-id="${questionId}"]`).closest('.border');
       questionElement.parentNode.insertBefore(editForm, questionElement.nextSibling);
 
-      // Gestion des événements pour le formulaire d'édition
       setupEditFormEventListeners(question);
     }
 
     function setupEditFormEventListeners(question) {
-      // Annuler l'édition
       document.querySelector('.cancel-edit').addEventListener('click', () => {
         editingQuestionId = null;
         renderExistingQuestions();
       });
 
-      // Ajouter une option (pour QCM)
       const addOptionBtn = document.querySelector('.edit-add-option');
       if (addOptionBtn) {
         addOptionBtn.addEventListener('click', () => {
@@ -524,7 +509,6 @@
           
           optionsContainer.appendChild(optionDiv);
           
-          // Ajouter l'écouteur d'événement pour le bouton de suppression
           optionDiv.querySelector('.edit-delete-option').addEventListener('click', (e) => {
             if (optionsContainer.children.length > 2) {
               e.target.closest('div').remove();
@@ -535,7 +519,6 @@
         });
       }
 
-      // Supprimer une option (pour QCM)
       document.querySelectorAll('.edit-delete-option').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const optionsContainer = document.getElementById('edit-options-container');
@@ -547,7 +530,6 @@
         });
       });
 
-      // Enregistrer les modifications
       document.querySelector('.save-edit').addEventListener('click', async () => {
         try {
           const content = document.querySelector('.edit-question-content').value;
@@ -572,7 +554,6 @@
             payload.tolerance_rate = tolerance_rate;
             payload.answer_text = answer_text;
           } else {
-            // QCM
             const options = [];
             const optionElements = document.querySelectorAll('#edit-options-container > div');
             
@@ -599,7 +580,6 @@
             payload.options = options;
           }
 
-          // Envoyer la requête de mise à jour
           const response = await fetch(`/api/questions/${question.id}`, {
             method: 'PUT',
             headers: { 
@@ -613,7 +593,7 @@
           if (response.ok) {
             alert('Question mise à jour avec succès');
             editingQuestionId = null;
-            loadExistingQuestions(); // Recharger les questions
+            loadExistingQuestions(); 
           } else {
             const errorData = await response.json();
             alert(`Erreur lors de la mise à jour: ${errorData.error || 'Erreur inconnue'}`);
@@ -625,7 +605,6 @@
       });
     }
 
-    // Ajouter une question directe
     document.getElementById('addDirectQuestion').addEventListener('click', () => {
       const questionId = Date.now();
       questions.push({
@@ -643,7 +622,6 @@
       scrollToQuestion(questionId);
     });
   
-    // Ajouter un QCM
     document.getElementById('addQCMQuestion').addEventListener('click', () => {
       const questionId = Date.now();
       questions.push({
@@ -663,12 +641,9 @@
       scrollToQuestion(questionId);
     });
   
-    // Enregistrer toutes les questions
     document.getElementById('saveAllQuestions').addEventListener('click', async () => {
     try {
-      // Si des nouvelles questions ont été ajoutées, les valider et enregistrer
       if (questions.length > 0) {
-        // Validation des nouvelles questions
         for (const question of questions) {
           if (!question.content.trim()) {
             alert('Veuillez remplir le texte de toutes les questions');
@@ -695,7 +670,6 @@
           }
         }
 
-        // Envoi des nouvelles questions
         const responses = await Promise.all(
           questions.map(question => {
             const payload = {
@@ -734,7 +708,6 @@
         }
       }
 
-      // Redirection vers /exam-details avec l'ID de l'examen (que des questions aient été ajoutées ou non)
       window.location.href = `/exam-details?exam_id=${examId}`;
       
     } catch (error) {
@@ -743,7 +716,6 @@
     }
   });
   
-    // Rendu des nouvelles questions
     function renderQuestions() {
       const container = document.getElementById('questionsContainer');
       container.innerHTML = '';
@@ -763,7 +735,6 @@
         questionDiv.className = 'border border-gray-200 p-3 rounded-md bg-white shadow-xs hover:shadow-sm transition text-sm';
         questionDiv.id = `question-${question.id}`;
         
-        // En-tête de la question
         questionDiv.innerHTML = `
           <div class="flex justify-between items-center mb-2 pb-1 border-b">
             <h3 class="font-medium flex items-center text-sm">
@@ -785,7 +756,6 @@
           </div>
         `;
 
-        // Champs spécifiques selon le type de question
         if (question.type === 'direct') {
           questionDiv.innerHTML += `
             <div class="grid grid-cols-3 gap-2 mb-2">
@@ -818,7 +788,6 @@
             </div>
           `;
         } else {
-          // QCM - Points et Durée seulement
           questionDiv.innerHTML += `
             <div class="grid grid-cols-2 gap-2 mb-2">
               <div>
@@ -836,7 +805,6 @@
             </div>
           `;
 
-          // Options de réponse pour QCM
           const optionsDiv = document.createElement('div');
           optionsDiv.className = 'space-y-1 mb-2';
           optionsDiv.innerHTML = `
@@ -879,12 +847,10 @@
         container.appendChild(questionDiv);
       });
 
-      // Gestion des événements
       setupEventListeners();
     }
 
     function setupEventListeners() {
-      // Contenu de la question
       document.querySelectorAll('.question-content').forEach(el => {
         el.addEventListener('input', (e) => {
           const questionId = parseInt(e.target.dataset.id);
@@ -893,7 +859,6 @@
         });
       });
 
-      // Durée
       document.querySelectorAll('.question-duration').forEach(el => {
         el.addEventListener('input', (e) => {
           const questionId = parseInt(e.target.dataset.id);
@@ -902,7 +867,6 @@
         });
       });
 
-      // Score
       document.querySelectorAll('.question-score').forEach(el => {
         el.addEventListener('input', (e) => {
           const questionId = parseInt(e.target.dataset.id);
@@ -911,7 +875,6 @@
         });
       });
 
-      // Tolérance (questions directes)
       document.querySelectorAll('.question-tolerance').forEach(el => {
         el.addEventListener('input', (e) => {
           const questionId = parseInt(e.target.dataset.id);
@@ -920,7 +883,6 @@
         });
       });
 
-      // Réponse directe
       document.querySelectorAll('.answer-text').forEach(el => {
         el.addEventListener('input', (e) => {
           const questionId = parseInt(e.target.dataset.qid);
@@ -929,7 +891,6 @@
         });
       });
 
-      // Options QCM
       document.querySelectorAll('.option-text').forEach(el => {
         el.addEventListener('input', (e) => {
           const questionId = parseInt(e.target.dataset.qid);
@@ -939,7 +900,6 @@
         });
       });
 
-      // Checkboxes QCM
       document.querySelectorAll('.checkbox-option').forEach(el => {
         el.addEventListener('change', (e) => {
           const questionId = parseInt(e.target.dataset.qid);
@@ -951,7 +911,6 @@
         });
       });
 
-      // Suppression de question
       document.querySelectorAll('.delete-question').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const questionId = parseInt(e.target.closest('button').dataset.id);
@@ -962,7 +921,7 @@
         });
       });
 
-      // Suppression d'option (QCM)
+      
       document.querySelectorAll('.delete-option').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const questionId = parseInt(e.target.closest('button').dataset.qid);
@@ -978,7 +937,6 @@
         });
       });
 
-      // Ajout d'option (QCM)
       document.querySelectorAll('.add-option').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const questionId = parseInt(e.target.closest('button').dataset.qid);
@@ -999,11 +957,9 @@
       }
     }
 
-    // Initialisation
     loadExistingQuestions();
     renderQuestions();
 
-    // Gestion de la déconnexion
     document.getElementById('logoutBtn').addEventListener('click', async () => {
       try {
         await fetch('/api/auth/logout', {

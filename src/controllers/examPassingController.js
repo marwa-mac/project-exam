@@ -1,6 +1,7 @@
 const Question = require('../models/questionsModel');
 const QuestionOption = require('../models/questionsOptionsModel');
 const ExamParticipation = require('../models/examParticipationModel');
+const pool = require('../BDD/run');
 
 const examPassingController = {
   startExam: async (req, res) => {
@@ -13,19 +14,19 @@ const examPassingController = {
         return res.status(400).json({ error: 'Paramètres manquants' });
       }
 
-      // Vérifier si l'utilisateur a déjà commencé cet examen
+      
       const existingParticipation = await ExamParticipation.getUserParticipation(examId, userId);
       if (existingParticipation && existingParticipation.finished_at) {
         return res.status(400).json({ error: 'Vous avez déjà terminé cet examen' });
       }
 
-      // Démarrer ou reprendre l'examen
+      
       const participationId = await ExamParticipation.startExam(examId, userId, latitude, longitude);
 
-      // Récupérer les questions de l'examen
+      
       const questions = await Question.findByExamId(examId);
 
-      // Pour chaque question, récupérer les options/réponses
+      
       const questionsWithDetails = await Promise.all(
         questions.map(async (question) => {
           let answers;
@@ -60,79 +61,119 @@ const examPassingController = {
 
   submitAnswers: async (req, res) => {
     try {
-      const { participationId } = req.params;
-      const { answers } = req.body;
-      const userId = req.userId;
+        const { participationId } = req.params;
+        const { answers } = req.body;
+        const userId = req.userId;
 
-      if (!participationId || !answers || !Array.isArray(answers)) {
-        return res.status(400).json({ error: 'Paramètres invalides' });
-      }
-
-      // Vérifier que la participation appartient à l'utilisateur
-      const participation = await ExamParticipation.getUserParticipationById(participationId);
-      if (!participation || participation.user_id !== userId) {
-        return res.status(403).json({ error: 'Non autorisé' });
-      }
-
-      if (participation.finished_at) {
-        return res.status(400).json({ error: 'Examen déjà terminé' });
-      }
-
-      let totalScore = 0;
-
-      // Traiter chaque réponse
-      for (const answer of answers) {
-        const question = await Question.findById(answer.questionId);
-        if (!question) continue;
-
-        let isCorrect = false;
-        let score = 0;
-
-        if (question.question_type === 'direct') {
-          const correctAnswer = await QuestionOption.getDirectAnswer(question.id);
-          isCorrect = answer.answer.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
-          
-          // Appliquer un taux de tolérance si nécessaire
-          if (question.tolerance_rate > 0) {
-            // Implémentez votre logique de comparaison avec tolérance ici
-          }
-        } else if (question.question_type === 'qcm') {
-          const correctOptions = await QuestionOption.getQCMOptions(question.id)
-            .then(options => options.filter(opt => opt.is_correct).map(opt => opt.id.toString()));
-          
-          isCorrect = arraysEqual(answer.answer.sort(), correctOptions.sort());
+        
+        if (!participationId || !answers || !Array.isArray(answers)) {
+            return res.status(400).json({ error: 'Paramètres manquants ou invalides' });
         }
 
-        if (isCorrect) {
-          score = question.score;
-          totalScore += score;
+        
+        const participation = await ExamParticipation.getUserParticipationById(participationId);
+        if (!participation || participation.user_id !== userId) {
+            return res.status(403).json({ error: 'Participation non trouvée ou non autorisée' });
+        }
+        if (participation.finished_at) {
+            return res.status(400).json({ error: 'Cet examen a déjà été terminé' });
         }
 
-        await ExamParticipation.saveAnswer(
-          participationId,
-          answer.questionId,
-          JSON.stringify(answer.answer),
-          isCorrect,
-          score
+        let totalScore = 0;
+        const errors = [];
+
+        
+        for (const answerData of answers) {
+            try {
+                const question = await Question.findById(answerData.questionId);
+                if (!question) {
+                    errors.push(`Question ${answerData.questionId} non trouvée`);
+                    continue;
+                }
+
+                
+                let userAnswer = answerData.answer;
+                let isCorrect = false;
+                let score = 0;
+
+               
+                if (question.question_type === 'direct') {
+                   const correctAnswer = await QuestionOption.getDirectAnswer(question.id);
+                    if (userAnswer && correctAnswer) {
+                        isCorrect = userAnswer.toString().trim().toLowerCase() === 
+                                    correctAnswer.toString().trim().toLowerCase();
+                    }
+
+                } else if (question.question_type === 'qcm') {
+                    if (!Array.isArray(userAnswer)) {
+                        userAnswer = [userAnswer];
+                    }
+                  
+                    const correctOptions = await QuestionOption.getQCMOptions(question.id);
+                    const correctOptionIds = correctOptions
+                        .filter(opt => opt.is_correct)
+                        .map(opt => opt.id.toString());
+
+                    isCorrect = JSON.stringify(userAnswer.sort()) === JSON.stringify(correctOptionIds.sort());
+                }
+
+                if (isCorrect) {
+                    score = question.score || 0;
+                    totalScore += score;
+                }
+
+                await pool.query(
+                    `INSERT INTO exam_answers 
+                     (participation_id, question_id, answer, is_correct, score) 
+                     VALUES (?, ?, ?, ?, ?)`,
+                    [
+                        participationId,
+                        question.id, 
+                        Array.isArray(userAnswer) ? JSON.stringify(userAnswer) : userAnswer, 
+                        isCorrect,
+                        score
+                    ]
+                );
+
+            } catch (error) {
+                console.error(`Erreur traitement réponse Q${answerData.questionId}:`, error);
+                errors.push(`Erreur sur la question ${answerData.questionId}`);
+            }
+        }
+
+        await pool.query(
+            `UPDATE exam_participations 
+             SET finished_at = NOW(), total_score = ? 
+             WHERE id = ?`,
+            [totalScore, participationId]
         );
-      }
 
-      // Finaliser l'examen
-      await ExamParticipation.finishExam(participationId, totalScore);
 
-      res.json({ 
-        success: true,
-        totalScore
-      });
+        if (errors.length > 0) {
+            return res.status(207).json({ 
+                success: true,
+                totalScore,
+                message: 'Certaines réponses n\'ont pas pu être enregistrées',
+                errors,
+                savedAnswers: answers.length - errors.length
+            });
+        }
+
+        res.json({
+            success: true,
+            totalScore,
+            message: 'Toutes les réponses ont été enregistrées avec succès'
+        });
 
     } catch (error) {
-      console.error('Erreur soumission réponses:', error);
-      res.status(500).json({ 
-        error: 'Erreur serveur',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
-      });
+        console.error('Erreur soumission des réponses:', error);
+        res.status(500).json({
+            error: 'Erreur serveur',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
-  },
+},
+
 
   getExamResults: async (req, res) => {
     try {
@@ -165,7 +206,8 @@ const examPassingController = {
   }
 };
 
-// Helper function
+
+
 function arraysEqual(a, b) {
   if (a === b) return true;
   if (a == null || b == null) return false;

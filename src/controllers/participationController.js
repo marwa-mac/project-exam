@@ -5,7 +5,7 @@ exports.getMyExamsParticipations = async (req, res) => {
         const creatorId = req.userId;
         const participations = await Participation.findByCreator(creatorId);
         
-        // Formater les données pour inclure la géolocalisation comme objet
+ 
         const formattedData = participations.map(participation => ({
             exam_name: participation.exam_name,
             participant_name: participation.participant_name,
