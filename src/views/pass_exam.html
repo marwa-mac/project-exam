@@ -12,31 +12,78 @@
       --secondary: #2980b9;
       --accent: #e74c3c;
       --light: #f9f9f9;
+      --text: #2d3436;
+      --blue-light: #d0e6ff;
     }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--light);
+      color: var(--text);
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .page-title {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      position: relative;
+      font-weight: 600;
+    }
+
+    .page-title::after {
+      content: "";
+      position: absolute;
+      width: 60px;
+      height: 3px;
+      background: var(--secondary);
+      bottom: -6px;
+      left: 0;
+    }
+
     .card:hover {
       transform: translateY(-5px);
       box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     }
+
+    .hidden { display: none; }
+    .fixed { position: fixed; }
+    .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+    .bg-opacity-50 { background-color: rgba(0, 0, 0, 0.5); }
+    .z-50 { z-index: 50; }
+    .max-w-md { max-width: 28rem; }
   </style>
 </head>
-<body class="bg-gray-50">
-  <!-- Header -->
-  <header class="bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white p-6">
-    <div class="container mx-auto flex justify-between items-center">
-      <h1 class="text-2xl font-bold">EliteXam</h1>
-      <nav class="flex items-center space-x-6">
-        <a href="/created" class="hover:text-gray-200">Mes examens</a>
-        <a href="/exams" class="font-semibold">Passer un examen</a>
-        <button id="logoutBtn" class="hover:text-gray-200">Déconnexion</button>
-      </nav>
+<body>
+
+  <header>
+    <img src="eliteexam.png" width="120px" alt="Trulli" >
+    <div class="avatar">
+      <a href="/created" class="text-gray-300 hover:text-white transition-colors mx-2">Mes examens</a>
+      <a href="/exams" class="text-white transition-colors mx-2">Examens</a>
+      <a href="/participations" class="text-gray-300 hover:text-white transition-colors mx-2">Results</a>
+      <button id="logoutBtn" class="text-gray-300 hover:text-white transition-colors mx-2 bg-transparent border-none cursor-pointer">
+        Déconnexion
+       </button>
     </div>
   </header>
 
-  <main class="container mx-auto px-4 py-8">
-    <h2 class="text-3xl font-bold mb-6 relative pb-2">
-      Examens disponibles
-      <span class="absolute bottom-0 left-0 w-16 h-1 bg-[var(--secondary)]"></span>
-    </h2>
+  <main class="container">
+    <h2 class="page-title">Examens Disponibles</h2>
 
     <div class="mb-8 flex flex-col md:flex-row gap-4">
       <input type="text" id="searchInput" placeholder="Rechercher un examen..." 
@@ -48,10 +95,53 @@
     </div>
   </main>
 
-  <!-- Footer -->
-  <footer class="bg-[#34495e] text-white py-12 mt-12">
+  <footer class="bg-[#34495e] text-white py-12">
     <div class="container mx-auto px-4">
-      <!-- ... (même footer que précédemment) ... -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div>
+                <h3 class="text-lg font-semibold mb-4">À propos</h3>
+                <p class="text-gray-400">ExamManager Pro est la solution leader pour la gestion des examens en milieu éducatif.</p>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Liens rapides</h3>
+                <ul class="space-y-2">
+                    <li><a href="#features" class="text-gray-400 hover:text-white">Fonctionnalités</a></li>
+                    <li><a href="#demo" class="text-gray-400 hover:text-white">Démonstration</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Support</h3>
+                <ul class="space-y-2">
+                    <li><a href="#help" class="text-gray-400 hover:text-white">Centre d'aide</a></li>
+                    <li><a href="#contact" class="text-gray-400 hover:text-white">Contact</a></li>
+                    <li><a href="#docs" class="text-gray-400 hover:text-white">Documentation</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Légal</h3>
+                <ul class="space-y-2">
+                    <li><a href="#privacy" class="text-gray-400 hover:text-white">Confidentialité</a></li>
+                    <li><a href="#terms" class="text-gray-400 hover:text-white">Conditions</a></li>
+                    <li><a href="#gdpr" class="text-gray-400 hover:text-white">RGPD</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 pt-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400">&copy; 2024 ExamManager Pro. Tous droits réservés.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#twitter" class="text-gray-400 hover:text-white">
+                        <i data-lucide="twitter" class="h-5 w-5"></i>
+                    </a>
+                    <a href="#linkedin" class="text-gray-400 hover:text-white">
+                        <i data-lucide="linkedin" class="h-5 w-5"></i>
+                    </a>
+                    <a href="#facebook" class="text-gray-400 hover:text-white">
+                        <i data-lucide="facebook" class="h-5 w-5"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
   </footer>
 
@@ -63,7 +153,11 @@
       // Gestion de la déconnexion
       document.getElementById('logoutBtn').addEventListener('click', async () => {
         try {
-          await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+          await fetch('/api/auth/logout', { 
+            method: 'POST', 
+            credentials: 'include' 
+          });
+          localStorage.removeItem('currentUser');
           window.location.href = '/auth';
         } catch (error) {
           console.error('Erreur déconnexion:', error);
@@ -71,10 +165,15 @@
       });
     });
 
+
     async function checkAuth() {
       try {
-        const response = await fetch('/api/auth/profile', { credentials: 'include' });
-        if (!response.ok) window.location.href = '/auth';
+        const response = await fetch('/api/auth/profile', { 
+          credentials: 'include' 
+        });
+        if (!response.ok) {
+          window.location.href = '/auth';
+        }
       } catch (error) {
         window.location.href = '/auth';
       }
@@ -82,14 +181,16 @@
 
     async function loadExams() {
       try {
-        const response = await fetch('/api/exams', { credentials: 'include' });
+        const response = await fetch('/api/exams', { 
+          credentials: 'include' 
+        });
         if (!response.ok) throw new Error('Erreur chargement examens');
         
         const exams = await response.json();
         displayExams(exams);
       } catch (error) {
         console.error('Erreur:', error);
-        alert("Erreur lors du chargement des examens");
+        showError("Erreur lors du chargement des examens");
       }
     }
 
@@ -140,9 +241,30 @@
         
       } catch (error) {
         console.error('Erreur démarrage examen:', error);
-        alert("Impossible de démarrer l'examen: " + error.message);
+        showError("Impossible de démarrer l'examen: " + error.message);
       }
     }
+
+    function showError(message) {
+      const errorElement = document.getElementById('error-message') || createMessageElement('error-message', 'text-red-500');
+      errorElement.textContent = message;
+      setTimeout(() => errorElement.textContent = '', 5000);
+    }
+
+    function showSuccess(message) {
+      const successElement = document.getElementById('success-message') || createMessageElement('success-message', 'text-green-500');
+      successElement.textContent = message;
+      setTimeout(() => successElement.textContent = '', 3000);
+    }
+
+    function createMessageElement(id, className) {
+      const element = document.createElement('div');
+      element.id = id;
+      element.className = `fixed top-4 right-4 p-4 rounded-md bg-white shadow-lg ${className}`;
+      document.body.appendChild(element);
+      return element;
+    }
   </script>
+
 </body>
 </html>

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Détails de l'examen</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #2c3e50;
+      --secondary: #2980b9;
+      --accent: #e74c3c;
+      --light: #f9f9f9;
+      --text: #2d3436;
+      --blue-light: #d0e6ff;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--light);
+      color: var(--text);
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    /* Styles spécifiques à la page de détails */
+    .exam-details-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .exam-info {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .info-item {
+      background-color: #f9f9f9;
+      padding: 12px;
+      border-radius: 6px;
+    }
+
+    .info-item strong {
+      display: block;
+      margin-bottom: 5px;
+      color: #4a6fa5;
+    }
+
+    .question {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .question h3 {
+      margin-top: 0;
+      color: #4a6fa5;
+    }
+
+    .qcm-option {
+      padding: 8px;
+      margin: 5px 0;
+      border-left: 4px solid #ddd;
+    }
+
+    .correct {
+      border-left-color: #4CAF50;
+      background-color: #e8f5e9;
+    }
+
+    .incorrect {
+      border-left-color: #f44336;
+      background-color: #ffebee;
+    }
+
+    .direct-answer {
+      padding: 8px;
+      margin: 5px 0;
+      border-left: 4px solid #4a6fa5;
+      background-color: #e3f2fd;
+    }
+
+    .duration-badge {
+      display: inline-block;
+      background-color: #ff9800;
+      color: white;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      margin-left: 10px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: var(--secondary);
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-top: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background-color: var(--primary);
+    }
+
+    .copy-link {
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .copy-link input {
+      flex-grow: 1;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px 0 0 4px;
+    }
+
+    .copy-link button {
+      padding: 8px 12px;
+      background-color: var(--secondary);
+      color: white;
+      border: none;
+      border-radius: 0 4px 4px 0;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .copy-link button:hover {
+      background-color: var(--primary);
+    }
+
+    /* Footer styles */
+    footer {
+      background-color: #34495e;
+      color: white;
+      padding: 3rem 0;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .footer-section h3 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .footer-section ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .footer-section li {
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-section a {
+      color: #bdc3c7;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-section a:hover {
+      color: white;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 2rem;
+      margin-top: 2rem;
+      border-top: 1px solid #2c3e50;
+    }
+
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .social-icons a {
+      color: #bdc3c7;
+      transition: color 0.3s;
+    }
+
+    .social-icons a:hover {
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>EliteXam</h1>
+    <div class="avatar">
+      <a href="/created" class="text-white transition-colors mx-2">Mes examens</a>
+      <a href="/exams" class="text-gray-300 hover:text-white transition-colors mx-2">Examens</a>
+      <button id="logoutBtn" class="text-gray-300 hover:text-white transition-colors mx-2 bg-transparent border-none cursor-pointer">
+        Déconnexion
+       </button>
+    </div>
+  </header>
+
+  <main class="exam-details-container">
+    <div class="exam-info">
+      <h1 id="exam-title">Détails de l'examen</h1>
+      
+      <div class="info-grid">
+        <div class="info-item">
+          <strong>Public cible</strong>
+          <span id="target-audience"></span>
+        </div>
+        <div class="info-item">
+          <strong>Semestre</strong>
+          <span id="semestre"></span>
+        </div>
+        <div class="info-item">
+          <strong>Durée totale</strong>
+          <span id="total-duration" class="duration-badge">0 min</span>
+        </div>
+        <div class="info-item">
+          <strong>Note totale</strong>
+          <span id="total-note" class="duration-badge">0 points</span>
+        </div>
+      </div>
+      
+      <p><strong>Lien d'accès :</strong></p>
+      <div class="copy-link">
+        <input type="text" id="access-link" readonly>
+        <button onclick="copyAccessLink()">Copier</button>
+      </div>
+      
+      <button class="btn" onclick="editQuestions()">Modifier les questions</button>
+    </div>
+
+    <div id="questions-container">
+      <!-- Les questions seront ajoutées ici dynamiquement -->
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-section">
+        <h3>À propos</h3>
+        <p>EliteXam est la solution leader pour la gestion des examens en milieu éducatif.</p>
+      </div>
+      <div class="footer-section">
+        <h3>Liens rapides</h3>
+        <ul>
+          <li><a href="#features">Fonctionnalités</a></li>
+          <li><a href="#demo">Démonstration</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Support</h3>
+        <ul>
+          <li><a href="#help">Centre d'aide</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><a href="#docs">Documentation</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Légal</h3>
+        <ul>
+          <li><a href="#privacy">Confidentialité</a></li>
+          <li><a href="#terms">Conditions</a></li>
+          <li><a href="#gdpr">RGPD</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 EliteXam. Tous droits réservés.</p>
+      <div class="social-icons">
+        <a href="#twitter"><i class="fab fa-twitter"></i></a>
+        <a href="#linkedin"><i class="fab fa-linkedin"></i></a>
+        <a href="#facebook"><i class="fab fa-facebook"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Récupérer l'ID de l'examen depuis l'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const examId = urlParams.get('exam_id');
+
+    // Fonction pour charger les détails de l'examen
+    async function loadExamDetails() {
+      try {
+        const response = await fetch(`/api/exam-details/${examId}`);
+        if (!response.ok) {
+          throw new Error('Examen non trouvé');
+        }
+        const exam = await response.json();
+
+        // Afficher les informations de l'examen
+        document.getElementById('exam-title').textContent = exam.title;
+        document.getElementById('target-audience').textContent = exam.targetAudience;
+        document.getElementById('semestre').textContent = exam.semestre;
+        document.getElementById('access-link').value = `${window.location.origin}/exam?access=${exam.access_link}`;
+
+        // Calculer et afficher la durée totale
+        const totalDuration = exam.questions.reduce((sum, q) => sum + (q.duration || 0), 0);
+        const durationMinutes = Math.ceil(totalDuration / 60);
+        const totalNote = exam.questions.reduce((sum, q) => sum + (q.score || 0), 0);
+        document.getElementById('total-duration').textContent = `${durationMinutes} min`;
+        document.getElementById('total-note').textContent = `${totalNote} point${totalNote > 1 ? 's' : ''}`;
+
+        // Afficher les questions
+        const questionsContainer = document.getElementById('questions-container');
+        questionsContainer.innerHTML = '';
+
+        exam.questions.forEach((question, index) => {
+          const questionElement = document.createElement('div');
+          questionElement.className = 'question';
+          
+          let answersHtml = '';
+          if (question.question_type === 'qcm') {
+            question.answers.forEach(answer => {
+              const answerClass = answer.is_correct ? 'correct' : 'incorrect';
+              answersHtml += `
+                <div class="qcm-option ${answerClass}">
+                  ${answer.option_text}
+                  ${answer.is_correct ? ' (Correct)' : ' (Incorrect)'}
+                </div>
+              `;
+            });
+          } else {
+            answersHtml = `
+              <div class="direct-answer">
+                Réponse correcte: ${question.answers.correct_answer}
+              </div>
+            `;
+          }
+
+          questionElement.innerHTML = `
+            <h3>Question ${index + 1} <span class="duration-badge">${question.duration} sec</span></h3>
+            <p>${question.content}</p>
+            <div class="answers">
+              ${answersHtml}
+            </div>
+            <p><strong>Score :</strong> ${question.score} point${question.score > 1 ? 's' : ''}</p>
+          `;
+
+          questionsContainer.appendChild(questionElement);
+        });
+
+      } catch (error) {
+        console.error('Erreur:', error);
+        alert('Erreur lors du chargement des détails de l\'examen');
+      }
+    }
+
+    // Fonction pour copier le lien d'accès
+    function copyAccessLink() {
+      const copyText = document.getElementById('access-link');
+      copyText.select();
+      copyText.setSelectionRange(0, 99999);
+      document.execCommand('copy');
+      alert('Lien copié dans le presse-papier');
+    }
+
+    // Fonction pour modifier les questions
+    function editQuestions() {
+      window.location.href = `/add-questions?exam_id=${examId}`;
+    }
+
+    // Gestion de la déconnexion
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      try {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          credentials: 'include'
+        });
+        localStorage.removeItem('currentUser');
+        window.location.href = '/auth';
+      } catch (error) {
+        console.error('Erreur déconnexion:', error);
+      }
+    });
+
+    // Charger les détails au chargement de la page
+    document.addEventListener('DOMContentLoaded', loadExamDetails);
+  </script>
+</body>
+</html>
